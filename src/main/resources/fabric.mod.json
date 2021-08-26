@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "villages",
+  "version": "${version}",
+  "name": "Villages",
+  "description": "https://github.com/Ronny-Gallin-Software-Engineering/mc-villages/blob/main/README.md",
+  "authors": [],
+  "contact": {
+    "website": "https://github.com/Ronny-Gallin-Software-Engineering/mc-villages"
+  },
+  "license": "MIT",
+  "icon": "assets/villages/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "de.rgse.mc.villages.client.VillagesClient"
+    ],
+    "main": [
+      "de.rgse.mc.villages.Villages"
+    ]
+  },
+  "mixins": [
+    "villages.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.11.6",
+    "fabric": "*",
+    "minecraft": "1.17.1"
+  }
+}
