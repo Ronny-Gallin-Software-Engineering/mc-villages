@@ -1,0 +1,8 @@
+{
+  "tut_item_tooltip": "A tutorial Item",
+
+  "itemGroup.villages.general": "Tutorial Items",
+
+  "item.villages.tut_item": "Tutorial Item",
+  "item.villages.wanderer_spawn_egg": "Wanderer Spawn Egg"
+}

@@ -4,8 +4,22 @@
   "package": "de.rgse.mc.villages.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "ActivityAccessor",
+    "MemoryModuleTypeAccessor",
+    "PointOfInterestTypeAccessor",
+    "ScheduleAccessor"
   ],
   "client": [
+    "ActivityAccessor",
+    "MemoryModuleTypeAccessor",
+    "PointOfInterestTypeAccessor",
+    "ScheduleAccessor"
+  ],
+  "server": [
+    "ActivityAccessor",
+    "MemoryModuleTypeAccessor",
+    "PointOfInterestTypeAccessor",
+    "ScheduleAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

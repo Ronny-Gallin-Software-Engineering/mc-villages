@@ -11,12 +11,13 @@
   "license": "MIT",
   "icon": "assets/villages/icon.png",
   "environment": "*",
+  "accessWidener": "villages.accesswidener",
   "entrypoints": {
     "client": [
-      "de.rgse.mc.villages.client.VillagesClient"
+      "de.rgse.mc.villages.client.VillagesModClient"
     ],
     "main": [
-      "de.rgse.mc.villages.Villages"
+      "de.rgse.mc.villages.VillagesMod"
     ]
   },
   "mixins": [

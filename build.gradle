@@ -1,6 +1,7 @@
 plugins {
-    id 'fabric-loom' version '0.9.1'
-    id 'maven-publish'
+	id 'fabric-loom' version '0.9-SNAPSHOT'
+	id 'maven-publish'
+	id 'idea'
 }
 
 version = project.mod_version
@@ -14,6 +15,14 @@ repositories {
     // for more information about repositories.
 }
 
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+
 dependencies {
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -25,6 +34,8 @@ dependencies {
     
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
+
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
 }
 
 processResources {
