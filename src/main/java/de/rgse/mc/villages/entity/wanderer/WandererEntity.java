@@ -1,7 +1,6 @@
 package de.rgse.mc.villages.entity.wanderer;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import de.rgse.mc.villages.goal.MoveToCampfireGoal;
 import de.rgse.mc.villages.task.HelloTask;
 import de.rgse.mc.villages.task.VillagesActivities;
@@ -10,9 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.brain.Activity;
 import net.minecraft.entity.ai.brain.Brain;
-import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.entity.ai.goal.FleeEntityGoal;
 import net.minecraft.entity.ai.goal.WanderAroundGoal;
@@ -41,9 +38,9 @@ public class WandererEntity extends PassiveEntity {
     private void initBrain(World world) {
         brain.remember(VillagesModuleMemoryTypes.SAY_HELLO, true);
 
-        brain.setTaskList(Activity.CORE, 0, ImmutableList.of(new HelloTask()));
+        brain.setTaskList(VillagesActivities.GREET, 0, ImmutableList.of(new HelloTask()));
         brain.setCoreActivities(Collections.singleton(VillagesActivities.GREET));
-        brain.setDefaultActivity(Activity.IDLE);
+        brain.setDefaultActivity(VillagesActivities.GREET);
         brain.resetPossibleActivities();
         brain.refreshActivities(world.getTimeOfDay(), world.getTime());
     }
