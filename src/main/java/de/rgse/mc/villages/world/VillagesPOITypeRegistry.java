@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class VillagesPointOfInterestTypes {
+public class VillagesPOITypeRegistry {
 
     public static final List<Block> CAMPING_SITE_BLOCKS = Arrays.asList(Blocks.CAMPFIRE);
 

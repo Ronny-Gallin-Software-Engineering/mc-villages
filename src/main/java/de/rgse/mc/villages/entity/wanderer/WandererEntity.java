@@ -1,13 +1,11 @@
 package de.rgse.mc.villages.entity.wanderer;
 
 import com.google.common.collect.ImmutableList;
+import de.rgse.mc.villages.sensor.VillagesSensorRegistry;
 import de.rgse.mc.villages.goal.MoveToCampfireGoal;
 import de.rgse.mc.villages.task.HelloTask;
-import de.rgse.mc.villages.task.VillagesActivities;
-import de.rgse.mc.villages.task.VillagesModuleMemoryTypes;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import de.rgse.mc.villages.task.VillagesActivityRegistry;
+import de.rgse.mc.villages.task.VillagesModuleMemoryTypeRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
@@ -21,26 +19,44 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
-@EqualsAndHashCode(callSuper = true)
-@Getter
-@Setter
 public class WandererEntity extends PassiveEntity {
-
-    private BlockPos wanderTarget;
-    private boolean settled;
 
     public WandererEntity(EntityType<WandererEntity> entityType, World world) {
         super(entityType, world);
         initBrain(world);
     }
 
-    private void initBrain(World world) {
-        brain.remember(VillagesModuleMemoryTypes.SAY_HELLO, true);
+    public void setWanderTarget(BlockPos wanderTarget) {
+        if (wanderTarget != null) {
+            brain.remember(VillagesModuleMemoryTypeRegistry.CAMPSITE, wanderTarget);
 
-        brain.setTaskList(VillagesActivities.GREET, 0, ImmutableList.of(new HelloTask()));
-        brain.setCoreActivities(Collections.singleton(VillagesActivities.GREET));
-        brain.setDefaultActivity(VillagesActivities.GREET);
+        } else {
+            brain.forget(VillagesModuleMemoryTypeRegistry.CAMPSITE);
+        }
+    }
+
+    public void setSettled(boolean settled) {
+        brain.remember(VillagesModuleMemoryTypeRegistry.SETTLED, settled);
+    }
+
+    public BlockPos getWanderTarget() {
+        Optional<BlockPos> optionalMemory = brain.getOptionalMemory(VillagesModuleMemoryTypeRegistry.CAMPSITE);
+        return optionalMemory.orElse(null);
+    }
+
+    public boolean isSettled() {
+        return brain.getOptionalMemory(VillagesModuleMemoryTypeRegistry.SETTLED).orElse(false);
+    }
+
+    private void initBrain(World world) {
+        brain.remember(VillagesModuleMemoryTypeRegistry.SAY_HELLO, true);
+
+        brain.setTaskList(VillagesActivityRegistry.GREET, 10, ImmutableList.of(new HelloTask()));
+        brain.setCoreActivities(Collections.singleton(VillagesActivityRegistry.GREET));
+        brain.setDefaultActivity(VillagesActivityRegistry.GREET);
         brain.resetPossibleActivities();
         brain.refreshActivities(world.getTimeOfDay(), world.getTime());
     }
@@ -54,6 +70,11 @@ public class WandererEntity extends PassiveEntity {
     @Override
     public WandererEntity createChild(ServerWorld world, PassiveEntity entity) {
         return null;
+    }
+
+    @Override
+    protected Brain.Profile<?> createBrainProfile() {
+        return Brain.createProfile(List.of(VillagesModuleMemoryTypeRegistry.SAY_HELLO, VillagesModuleMemoryTypeRegistry.CAMPSITE, VillagesModuleMemoryTypeRegistry.SETTLED), List.of(VillagesSensorRegistry.CAMPSITE_SENSOR));
     }
 
     @Override

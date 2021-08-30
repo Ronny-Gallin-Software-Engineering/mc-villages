@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import net.minecraft.entity.ai.brain.Activity;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class VillagesActivities {
+public class VillagesActivityRegistry {
 
     public static final Activity GREET = ActivityAccessor.register(IdentifierUtil.createString("greet"));
 

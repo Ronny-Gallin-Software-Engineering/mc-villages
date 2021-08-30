@@ -1,10 +1,11 @@
 package de.rgse.mc.villages;
 
-import de.rgse.mc.villages.entity.VillagesEntities;
-import de.rgse.mc.villages.item.VillagesItems;
-import de.rgse.mc.villages.task.VillagesActivities;
-import de.rgse.mc.villages.task.VillagesSchedules;
-import de.rgse.mc.villages.world.VillagesPointOfInterestTypes;
+import de.rgse.mc.villages.entity.VillagesEntityRegistry;
+import de.rgse.mc.villages.sensor.VillagesSensorRegistry;
+import de.rgse.mc.villages.item.VillagesItemRegistry;
+import de.rgse.mc.villages.task.VillagesActivityRegistry;
+import de.rgse.mc.villages.task.VillagesScheduleRegistry;
+import de.rgse.mc.villages.world.VillagesPOITypeRegistry;
 import net.fabricmc.api.ModInitializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,11 +18,12 @@ public class VillagesMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        VillagesItems.register();
-        VillagesEntities.register();
-        VillagesPointOfInterestTypes.register();
-        VillagesActivities.register();
-        VillagesSchedules.register();
+        VillagesItemRegistry.register();
+        VillagesEntityRegistry.register();
+        VillagesPOITypeRegistry.register();
+        VillagesActivityRegistry.register();
+        VillagesScheduleRegistry.register();
+        VillagesSensorRegistry.register();
 
         LOGGER.info("{} initialized", MOD_ID);
     }

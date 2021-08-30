@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 import net.minecraft.entity.ai.brain.Schedule;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class VillagesSchedules {
+public class VillagesScheduleRegistry {
 
-    public static final Schedule DEFAULT = ScheduleAccessor.register(IdentifierUtil.createString("default_schedule")).withActivity(10, VillagesActivities.GREET).build();
+    public static final Schedule DEFAULT = ScheduleAccessor.register(IdentifierUtil.createString("default_schedule")).withActivity(10, VillagesActivityRegistry.GREET).build();
 
     public static void register(){}
 }

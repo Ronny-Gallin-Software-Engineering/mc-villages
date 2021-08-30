@@ -19,12 +19,14 @@ public class HelloTask extends Task<LivingEntity> {
     private int ticksRan;
 
     public HelloTask() {
-        super(Map.of(VillagesModuleMemoryTypes.SAY_HELLO, MemoryModuleState.VALUE_PRESENT));
+        super(Map.of(VillagesModuleMemoryTypeRegistry.SAY_HELLO, MemoryModuleState.VALUE_PRESENT));
     }
 
     @Override
     protected boolean shouldRun(ServerWorld world, LivingEntity entity) {
-        return ++ticksWaited >= COOLDOWN;
+        ticksWaited++;
+        LOGGER.info("shouldRun ticksWaited: {}", ticksWaited);
+        return ticksWaited >= COOLDOWN;
     }
 
     @Override
@@ -38,15 +40,20 @@ public class HelloTask extends Task<LivingEntity> {
         villagerEntity.getBrain().forget(MemoryModuleType.WALK_TARGET);
         this.ticksRan = 0;
         this.ticksWaited = 0;
+        LOGGER.info("finishRunning ticksRan: {}, ticksWaited: {}", ticksRan, ticksWaited);
     }
 
     @Override
     protected void keepRunning(ServerWorld serverWorld, LivingEntity villagerEntity, long l) {
-        ++this.ticksRan;
+        this.ticksRan++;
+        LOGGER.info("keepRunning ticksRan: {}", ticksRan);
     }
 
     @Override
     protected boolean shouldKeepRunning(ServerWorld serverWorld, LivingEntity villagerEntity, long l) {
-        return this.ticksRan < 1;
+        LOGGER.info("shouldKeepRunning ticksRan: {}", ticksRan);
+        return this.ticksRan <= 1;
     }
+
+
 }

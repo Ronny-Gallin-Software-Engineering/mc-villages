@@ -20,7 +20,7 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.util.registry.Registry;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class VillagesEntities {
+public class VillagesEntityRegistry {
 
     public static final EntityType<WandererEntity> WANDERER = Registry.register(Registry.ENTITY_TYPE, IdentifierUtil.create("wanderer"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WandererEntity::new)
@@ -33,15 +33,15 @@ public class VillagesEntities {
                     .build());
 
     public static void register() {
-        FabricDefaultAttributeRegistry.register(VillagesEntities.WANDERER, WandererEntity.createMobAttributes());
-        FabricDefaultAttributeRegistry.register(VillagesEntities.MONK, MonkEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(VillagesEntityRegistry.WANDERER, WandererEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(VillagesEntityRegistry.MONK, MonkEntity.createMobAttributes());
     }
 
     public static void registerClient() {
-        EntityRendererRegistry.register(VillagesEntities.WANDERER, WandererEntityRenderer::new);
-        EntityModelLayerRegistry.registerModelLayer(VillagesEntityModelLayers.WANDERER, () -> WandererEntityModel.getTexturedModelData(Dilation.NONE));
+        EntityRendererRegistry.register(VillagesEntityRegistry.WANDERER, WandererEntityRenderer::new);
+        EntityModelLayerRegistry.registerModelLayer(VillagesEntityModelLayerRegistry.WANDERER, () -> WandererEntityModel.getTexturedModelData(Dilation.NONE));
 
-        EntityRendererRegistry.register(VillagesEntities.MONK, MonkEntityRenderer::new);
-        EntityModelLayerRegistry.registerModelLayer(VillagesEntityModelLayers.MONK, () -> MonkEntityModel.getTexturedModelData(Dilation.NONE));
+        EntityRendererRegistry.register(VillagesEntityRegistry.MONK, MonkEntityRenderer::new);
+        EntityModelLayerRegistry.registerModelLayer(VillagesEntityModelLayerRegistry.MONK, () -> MonkEntityModel.getTexturedModelData(Dilation.NONE));
     }
 }

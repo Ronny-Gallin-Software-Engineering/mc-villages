@@ -1,7 +1,7 @@
 package de.rgse.mc.villages.goal;
 
 import de.rgse.mc.villages.entity.wanderer.WandererEntity;
-import de.rgse.mc.villages.world.VillagesPointOfInterestTypes;
+import de.rgse.mc.villages.world.VillagesPOITypeRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.ai.goal.MoveToTargetPosGoal;
 import net.minecraft.server.world.ServerWorld;
@@ -19,7 +19,7 @@ import java.util.Random;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-import static de.rgse.mc.villages.world.VillagesPointOfInterestTypes.CAMPING_SITE_BLOCKS;
+import static de.rgse.mc.villages.world.VillagesPOITypeRegistry.CAMPING_SITE_BLOCKS;
 
 public class MoveToCampfireGoal extends MoveToTargetPosGoal {
 
@@ -92,7 +92,7 @@ public class MoveToCampfireGoal extends MoveToTargetPosGoal {
         BlockPos blockPos = new BlockPos(mob.getPos());
 
         PointOfInterestStorage pointOfInterestStorage = ((ServerWorld) mob.world).getPointOfInterestStorage();
-        Stream<PointOfInterest> stream = pointOfInterestStorage.getInCircle(pointOfInterestType -> pointOfInterestType == VillagesPointOfInterestTypes.CAMPING_SITE, blockPos, RANGE, PointOfInterestStorage.OccupationStatus.ANY);
+        Stream<PointOfInterest> stream = pointOfInterestStorage.getInCircle(pointOfInterestType -> pointOfInterestType == VillagesPOITypeRegistry.CAMPING_SITE, blockPos, RANGE, PointOfInterestStorage.OccupationStatus.ANY);
 
         return stream.map(PointOfInterest::getPos).sorted(Comparator.comparingDouble(blockPos2 -> blockPos2.getSquaredDistance(blockPos))).toList();
     }

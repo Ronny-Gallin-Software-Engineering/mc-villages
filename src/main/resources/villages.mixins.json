@@ -7,20 +7,11 @@
     "ActivityAccessor",
     "MemoryModuleTypeAccessor",
     "PointOfInterestTypeAccessor",
-    "ScheduleAccessor"
+    "ScheduleAccessor",
+    "SensorTypeAccessor"
   ],
-  "client": [
-    "ActivityAccessor",
-    "MemoryModuleTypeAccessor",
-    "PointOfInterestTypeAccessor",
-    "ScheduleAccessor"
-  ],
-  "server": [
-    "ActivityAccessor",
-    "MemoryModuleTypeAccessor",
-    "PointOfInterestTypeAccessor",
-    "ScheduleAccessor"
-  ],
+  "client": [],
+  "server": [],
   "injectors": {
     "defaultRequire": 1
   }
