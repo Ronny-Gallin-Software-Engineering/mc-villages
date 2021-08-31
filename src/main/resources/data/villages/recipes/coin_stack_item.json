@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CCC",
+    "CCC",
+    "CCC"
+  ],
+  "key": {
+    "C": {
+      "item": "villages:coin_item"
+    }
+  },
+  "result": {
+    "item": "villages:coin_stack_item",
+    "count": 1
+  }
+}
+

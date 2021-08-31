@@ -14,6 +14,6 @@ public class WandererEntityRenderer extends MobEntityRenderer<WandererEntity, Wa
 
     @Override
     public Identifier getTexture(WandererEntity entity) {
-        return IdentifierUtil.create("textures/entity/wanderer/wanderer.png");
+        return IdentifierUtil.texture().entity().named("wanderer/wanderer.png");
     }
 }
