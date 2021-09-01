@@ -9,6 +9,8 @@ import net.minecraft.entity.ai.brain.Activity;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class VillagesActivityRegistry {
 
+    public static final Activity FIND_WOOD = ActivityAccessor.register(IdentifierUtil.createString("find_wood"));
+
     public static final Activity GREET = ActivityAccessor.register(IdentifierUtil.createString("greet"));
 
     public static void register() {

@@ -9,6 +9,7 @@ import de.rgse.mc.villages.entity.VillagesProfessionRegistry;
 import de.rgse.mc.villages.text.NameText;
 import de.rgse.mc.villages.util.IdentifierUtil;
 import de.rgse.mc.villages.util.NameUtil;
+import de.rgse.mc.villages.util.VillagesParticleUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -76,7 +77,8 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable {
 
     @Override
     public void registerControllers(AnimationData animationData) {
-        AnimationController<SettlerEntity> controller = new AnimationController(this, "controller", 0, this::handleAnimation);
+        AnimationController<SettlerEntity> controller = new AnimationController(this, "settler_controller", 0, this::handleAnimation);
+        controller.registerParticleListener(VillagesParticleUtil.createParticleListener(this, 2, () -> world.getRandom().nextInt(4) * .01f, 5));
         animationData.addAnimationController(controller);
     }
 
@@ -101,7 +103,7 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable {
         AnimationController<SettlerEntity> controller = event.getController();
 
         if (event.isMoving()) {
-            controller.setAnimation(VillagesAnimationRegistry.SETTLER_WALK);
+            controller.setAnimation(event.getAnimatable().getSettlerData().getMood().isSad() ? VillagesAnimationRegistry.SETTLER_WALK_SAD : VillagesAnimationRegistry.SETTLER_WALK);
         } else if (controller.getCurrentAnimation() == null && world.getRandom().nextInt(20) == 0) {
             controller.setAnimation(VillagesAnimationRegistry.randomSettlerIdle());
 
@@ -114,7 +116,7 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable {
 
     protected void initDataTracker() {
         super.initDataTracker();
-        this.dataTracker.startTracking(SETTLER_DATA, new SettlerData(Gender.MALE, null, VillagesProfessionRegistry.NONE));
+        this.dataTracker.startTracking(SETTLER_DATA, new SettlerData());
     }
 
     @Override

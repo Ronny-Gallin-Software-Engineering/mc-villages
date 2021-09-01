@@ -7,7 +7,8 @@ import net.minecraft.util.math.BlockPos;
 
 public class VillagesModuleMemoryTypeRegistry {
 
-    public static final MemoryModuleType<Boolean> SAY_HELLO = MemoryModuleTypeAccessor.register(IdentifierUtil.createString("hello"));
     public static final MemoryModuleType<BlockPos> CAMPSITE = MemoryModuleTypeAccessor.register(IdentifierUtil.createString("campsite"));
     public static final MemoryModuleType<Boolean> SETTLED = MemoryModuleTypeAccessor.register(IdentifierUtil.createString("settled"));
+
+    public static final MemoryModuleType<BlockPos> KNOW_WOOD = MemoryModuleTypeAccessor.register(IdentifierUtil.createString("know_wood"));
 }

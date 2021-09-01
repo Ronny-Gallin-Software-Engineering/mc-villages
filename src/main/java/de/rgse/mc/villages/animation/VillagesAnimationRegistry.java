@@ -12,6 +12,7 @@ import java.util.List;
 public class VillagesAnimationRegistry {
 
     public static final AnimationBuilder SETTLER_WALK = new AnimationBuilder().addAnimation("animation.villages:settler.walk", true);
+    public static final AnimationBuilder SETTLER_WALK_SAD = new AnimationBuilder().addAnimation("animation.villages:settler.walk_sad", true);
     public static final AnimationBuilder SETTLER_IDLE_0 = new AnimationBuilder().addAnimation("animation.villages:settler.idle_0", false);
     public static final AnimationBuilder SETTLER_IDLE_1 = new AnimationBuilder().addAnimation("animation.villages:settler.idle_1", false);
     public static final AnimationBuilder SETTLER_IDLE_2 = new AnimationBuilder().addAnimation("animation.villages:settler.idle_2", false);

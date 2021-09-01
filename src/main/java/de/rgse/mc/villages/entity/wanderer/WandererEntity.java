@@ -1,9 +1,6 @@
 package de.rgse.mc.villages.entity.wanderer;
 
-import com.google.common.collect.ImmutableList;
-import de.rgse.mc.villages.sensor.VillagesSensorRegistry;
 import de.rgse.mc.villages.goal.MoveToCampfireGoal;
-import de.rgse.mc.villages.task.HelloTask;
 import de.rgse.mc.villages.task.VillagesActivityRegistry;
 import de.rgse.mc.villages.task.VillagesModuleMemoryTypeRegistry;
 import net.minecraft.entity.EntityType;
@@ -19,7 +16,6 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 public class WandererEntity extends PassiveEntity {
@@ -52,9 +48,9 @@ public class WandererEntity extends PassiveEntity {
     }
 
     private void initBrain(World world) {
-        brain.remember(VillagesModuleMemoryTypeRegistry.SAY_HELLO, true);
+        //brain.remember(VillagesModuleMemoryTypeRegistry.SAY_HELLO, true);
 
-        brain.setTaskList(VillagesActivityRegistry.GREET, 10, ImmutableList.of(new HelloTask()));
+        //brain.setTaskList(VillagesActivityRegistry.GREET, 10, ImmutableList.of(new HelloTask()));
         brain.setCoreActivities(Collections.singleton(VillagesActivityRegistry.GREET));
         brain.setDefaultActivity(VillagesActivityRegistry.GREET);
         brain.resetPossibleActivities();
@@ -72,10 +68,10 @@ public class WandererEntity extends PassiveEntity {
         return null;
     }
 
-    @Override
+   /* @Override
     protected Brain.Profile<?> createBrainProfile() {
         return Brain.createProfile(List.of(VillagesModuleMemoryTypeRegistry.SAY_HELLO, VillagesModuleMemoryTypeRegistry.CAMPSITE, VillagesModuleMemoryTypeRegistry.SETTLED), List.of(VillagesSensorRegistry.CAMPSITE_SENSOR));
-    }
+    }*/
 
     @Override
     protected void initGoals() {

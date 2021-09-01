@@ -9,7 +9,5 @@ import net.minecraft.entity.ai.brain.ScheduleBuilder;
 public class VillagesTaskRegistry {
 
     public static void register() {
-        ScheduleAccessor.setVillagerDefault(
-                new ScheduleBuilder(VillagesScheduleRegistry.DEFAULT).withActivity(10, VillagesActivityRegistry.GREET).build());//10 is the start time
     }
 }

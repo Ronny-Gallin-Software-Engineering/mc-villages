@@ -55,6 +55,11 @@ public class IdentifierUtil {
         }
 
         public Identifier named(String name) {
+            identifier.append(name);
+            return new Identifier(VillagesMod.MOD_ID, identifier.toString());
+        }
+
+        public Identifier formatted(String name) {
             String format = gender != null ? getGendered(name) : name;
 
             identifier.append(format);

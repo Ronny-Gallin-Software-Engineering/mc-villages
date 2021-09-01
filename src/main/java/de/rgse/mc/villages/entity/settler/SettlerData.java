@@ -1,9 +1,6 @@
 package de.rgse.mc.villages.entity.settler;
 
-import de.rgse.mc.villages.entity.EntityName;
-import de.rgse.mc.villages.entity.Gender;
-import de.rgse.mc.villages.entity.Profession;
-import de.rgse.mc.villages.entity.VillagesProfessionRegistry;
+import de.rgse.mc.villages.entity.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +10,6 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Data
 public class SettlerData {
 
@@ -22,6 +18,15 @@ public class SettlerData {
     private EntityName villagerName;
 
     private Profession profession;
+
+    private Mood mood;
+
+    public SettlerData() {
+        this.gender = Gender.FEMALE;
+        this.villagerName = null;
+        this.profession = VillagesProfessionRegistry.NONE;
+        this.mood = new Mood();
+    }
 
     public static final TrackedDataHandler<SettlerData> SETTLER_DATA = new TrackedDataHandler<>() {
 
@@ -50,15 +55,15 @@ public class SettlerData {
     };
 
     public SettlerData withProfession(Profession profession) {
-        return new SettlerData(this.gender, this.villagerName, profession);
+        return new SettlerData(this.gender, this.villagerName, profession, this.mood);
     }
 
     public SettlerData withName(EntityName name) {
-        return new SettlerData(this.gender, name, this.profession);
+        return new SettlerData(this.gender, name, this.profession, this.mood);
     }
 
     public SettlerData withGender(Gender gender) {
-        return new SettlerData(gender, this.villagerName, this.profession);
+        return new SettlerData(gender, this.villagerName, this.profession, this.mood);
     }
 
     public static void register() {

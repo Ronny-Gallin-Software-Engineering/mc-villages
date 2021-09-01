@@ -35,13 +35,12 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     modImplementation 'software.bernie.geckolib:geckolib-fabric-1.17:3.0.13:dev'
-
-    implementation "me.zeroeightsix:fiber:${project.fiber_version}"
+    modImplementation 'org.apache.commons:commons-jexl:2.1.1'
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
 
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
+    compileOnly 'org.projectlombok:lombok:1.18.20'
 }
 
 processResources {

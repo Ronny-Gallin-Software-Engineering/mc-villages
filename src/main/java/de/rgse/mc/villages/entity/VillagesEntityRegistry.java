@@ -1,7 +1,9 @@
 package de.rgse.mc.villages.entity;
 
 import de.rgse.mc.villages.entity.lumberjack.LumberjackEntity;
+import de.rgse.mc.villages.entity.lumberjack.LumberjackEntityModel;
 import de.rgse.mc.villages.entity.settler.SettlerEntity;
+import de.rgse.mc.villages.entity.settler.SettlerEntityModel;
 import de.rgse.mc.villages.entity.settler.SettlerEntityRenderer;
 import de.rgse.mc.villages.entity.wanderer.WandererEntity;
 import de.rgse.mc.villages.entity.wanderer.WandererEntityModel;
@@ -47,7 +49,7 @@ public class VillagesEntityRegistry {
         EntityRendererRegistry.register(VillagesEntityRegistry.WANDERER, WandererEntityRenderer::new);
         EntityModelLayerRegistry.registerModelLayer(VillagesEntityModelLayerRegistry.WANDERER, () -> WandererEntityModel.getTexturedModelData(Dilation.NONE));
 
-        EntityRendererRegistry.register(VillagesEntityRegistry.SETTLER, SettlerEntityRenderer::new);
-        EntityRendererRegistry.register(VillagesEntityRegistry.LUMBERJACK, SettlerEntityRenderer::new);
+        EntityRendererRegistry.register(VillagesEntityRegistry.SETTLER, ctx -> SettlerEntityRenderer.of(ctx, SettlerEntityModel.class));
+        EntityRendererRegistry.register(VillagesEntityRegistry.LUMBERJACK, ctx -> SettlerEntityRenderer.of(ctx, LumberjackEntityModel.class));
     }
 }

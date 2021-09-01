@@ -14,12 +14,7 @@ public class SettlerEntityModel extends AnimatedGeoModel<SettlerEntity> {
 
     @Override
     public Identifier getTextureLocation(SettlerEntity settler) {
-        SettlerData settlerData = settler.getSettlerData();
-        if (settlerData.getProfession().equals(VillagesProfessionRegistry.LUMBERJACK)) {
-            return IdentifierUtil.texture().entity().gender(settlerData.getGender()).named("settler/lumberjack_{gender}.png");
-        } else {
-            return IdentifierUtil.texture().entity().named("settler/settler.png");
-        }
+        return IdentifierUtil.texture().entity().named("settler/settler.png");
     }
 
     @Override
