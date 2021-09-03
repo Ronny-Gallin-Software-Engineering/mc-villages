@@ -2,24 +2,27 @@ package de.rgse.mc.villages.gui;
 
 import de.rgse.mc.villages.entity.settler.SettlerEntity;
 import de.rgse.mc.villages.util.ClockUtil;
-import de.rgse.mc.villages.util.IdentifierUtil;
 import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
-import io.github.cottonmc.cotton.gui.widget.WButton;
 import io.github.cottonmc.cotton.gui.widget.WGridPanel;
 import io.github.cottonmc.cotton.gui.widget.WLabel;
-import io.github.cottonmc.cotton.gui.widget.WSprite;
+import io.github.cottonmc.cotton.gui.widget.WListPanel;
 import io.github.cottonmc.cotton.gui.widget.data.Insets;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.entity.ai.goal.PrioritizedGoal;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.TranslatableText;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class SettlerInfoGui extends LightweightGuiDescription {
 
     private final SettlerEntity settler;
+
+    private int index = 2;
 
     public SettlerInfoGui(@NotNull SettlerEntity settler) {
         this.settler = settler;
@@ -29,33 +32,41 @@ public class SettlerInfoGui extends LightweightGuiDescription {
         root.setSize(256, 240);
         root.setInsets(Insets.ROOT_PANEL);
 
-        WSprite icon = new WSprite(IdentifierUtil.texture().item().named("coin_item.png"));
-        root.add(icon, 0, 2, 1, 1);
+        WLabel labelBorn = new WLabel(new TranslatableText(VillagesGuis.translationKey("born")).append(":"));
+        root.add(labelBorn, 0, index);
+        WLabel valueBorn = new WLabel(new TranslatableText(VillagesGuis.translationKey("day")).append(" ").append(getBornValue()));
+        root.add(valueBorn, 2, index);
 
-        WButton button = new WButton(new TranslatableText("gui.examplemod.examplebutton"));
-        root.add(button, 0, 3, 4, 1);
+        WLabel labelAge = new WLabel(new TranslatableText(VillagesGuis.translationKey("age")).append(":"));
+        root.add(labelAge, 5, index);
+        WLabel valueAge = new WLabel(getBirthdayValue().append(" ").append(new TranslatableText(VillagesGuis.translationKey("days"))));
+        root.add(valueAge, 7, index);
 
-        WLabel labelBorn = new WLabel(new TranslatableText("villages.gui.born"));
-        root.add(labelBorn, 0, 4, 2, 1);
+        WLabel goalLabel = new WLabel(new TranslatableText(VillagesGuis.translationKey("goals")));
+        root.add(goalLabel, 0, ++index);
 
-        WLabel valueBorn = new WLabel(getBornValue());
-        root.add(valueBorn, 4, 4, 1, 1);
+        List<PrioritizedGoal> runningGoals = settler.getRunningGoals();
 
-        WLabel labelAge = new WLabel(new TranslatableText("villages.gui.age"));
-        root.add(labelAge, 0, 5, 2, 1);
+        if (!runningGoals.isEmpty()) {
+            WListPanel<PrioritizedGoal, WLabel> goalPanel = new WListPanel<>(runningGoals, () -> new WLabel(""), (goal, label) -> {
+                label.setText(new TranslatableText(goal.getGoal().getClass().getSimpleName()));
+            });
+            root.add(goalPanel, 0, index);
 
-        WLabel valueAge = new WLabel(getBirthdayValue());
-        root.add(valueAge, 4, 5, 1, 1);
+        } else {
+            WLabel wLabel = new WLabel(new TranslatableText(VillagesGuis.translationKey("idle")));
+            root.add(wLabel, 0, index);
+        }
 
         root.validate(this);
     }
 
-    private Text getBornValue() {
+    private MutableText getBornValue() {
         int age = ClockUtil.getAge(settler);
         return new LiteralText(Integer.toString(age));
     }
 
-    private Text getBirthdayValue() {
+    private MutableText getBirthdayValue() {
         int age = ClockUtil.toDay(settler.getSettlerData().getBirthday());
         return new LiteralText(Integer.toString(age));
     }

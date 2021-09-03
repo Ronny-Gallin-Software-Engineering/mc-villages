@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class VillagesAnimationRegistry {
+public class VillagesAnimations {
 
     public static final AnimationBuilder SETTLER_WALK = new AnimationBuilder().addAnimation("animation.villages:settler.walk", true);
     public static final AnimationBuilder SETTLER_WALK_SAD = new AnimationBuilder().addAnimation("animation.villages:settler.walk_sad", true);

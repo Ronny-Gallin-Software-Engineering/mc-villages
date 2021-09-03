@@ -1,11 +1,8 @@
 package de.rgse.mc.villages.entity.settler;
 
 import de.rgse.mc.villages.VillagesMod;
-import de.rgse.mc.villages.animation.VillagesAnimationRegistry;
-import de.rgse.mc.villages.entity.EntityName;
-import de.rgse.mc.villages.entity.Gender;
-import de.rgse.mc.villages.entity.VillagesEntityRegistry;
-import de.rgse.mc.villages.entity.VillagesProfessionRegistry;
+import de.rgse.mc.villages.animation.VillagesAnimations;
+import de.rgse.mc.villages.entity.*;
 import de.rgse.mc.villages.gui.SettlerInfoScreen;
 import de.rgse.mc.villages.text.NameText;
 import de.rgse.mc.villages.util.IdentifierUtil;
@@ -21,6 +18,7 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.entity.ai.goal.FleeEntityGoal;
+import net.minecraft.entity.ai.goal.PrioritizedGoal;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.mob.*;
@@ -30,7 +28,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -45,13 +45,15 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
 public class SettlerEntity extends PassiveEntity implements IAnimatable {
 
     private static final TrackedData<SettlerData> SETTLER_DATA = DataTracker.registerData(SettlerEntity.class, SettlerData.SETTLER_DATA);
-
     private final AnimationFactory animationFactory = new AnimationFactory(this);
 
     public SettlerEntity(EntityType<? extends SettlerEntity> entityType, World world) {
@@ -59,6 +61,7 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable {
         this.ignoreCameraFrustum = true;
         this.setSettlerData(this.getSettlerData());
         setCustomNameVisible(true);
+        setMovementSpeed(.4f);
     }
 
     protected void initBrain(World world) {
@@ -81,7 +84,7 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable {
     @Override
     public SettlerEntity createChild(ServerWorld world, PassiveEntity parent) {
         if (parent.getClass().isAssignableFrom(SettlerEntity.class)) {
-            return new SettlerEntity(VillagesEntityRegistry.SETTLER, world);
+            return new SettlerEntity(VillagesEntities.SETTLER, world);
         } else {
             return null;
         }
@@ -115,12 +118,12 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable {
         AnimationController<SettlerEntity> controller = event.getController();
 
         if (event.isMoving()) {
-            controller.setAnimation(event.getAnimatable().getSettlerData().getMood().isSad() ? VillagesAnimationRegistry.SETTLER_WALK_SAD : VillagesAnimationRegistry.SETTLER_WALK);
+            controller.setAnimation(event.getAnimatable().getSettlerData().getMood().isSad() ? VillagesAnimations.SETTLER_WALK_SAD : VillagesAnimations.SETTLER_WALK);
         } else if (controller.getCurrentAnimation() == null && world.getRandom().nextInt(20) == 0) {
-            controller.setAnimation(VillagesAnimationRegistry.randomSettlerIdle());
+            controller.setAnimation(VillagesAnimations.randomSettlerIdle());
 
         } else {
-            controller.setAnimation(VillagesAnimationRegistry.SETTLER_IDLE_0);
+            controller.setAnimation(VillagesAnimations.SETTLER_IDLE_0);
         }
 
         return PlayState.CONTINUE;
@@ -140,10 +143,10 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable {
 
         long time = world.toServerWorld().getLevelProperties().getTime();
 
-        this.setSettlerData(this.getSettlerData().withProfession(VillagesProfessionRegistry.NONE).withGender(gender).withName(name).withBirthday(time));
+        this.setSettlerData(this.getSettlerData().withProfession(VillagesProfessions.NONE).withGender(gender).withName(name).withBirthday(time).withDefaultMovementSpeed(.4f));
 
         if (spawnReason == SpawnReason.BREEDING) {
-            this.setSettlerData(this.getSettlerData().withProfession(VillagesProfessionRegistry.NONE));
+            this.setSettlerData(this.getSettlerData().withProfession(VillagesProfessions.NONE));
         }
 
         setCustomName(NameText.of(this));
@@ -194,7 +197,7 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable {
 
             if (villagesNbt.contains(IdentifierUtil.createString("profession"))) {
                 Identifier identifier = Identifier.tryParse(villagesNbt.getString(IdentifierUtil.createString("profession")));
-                settlerData.setProfession(VillagesProfessionRegistry.of(identifier));
+                settlerData.setProfession(VillagesProfessions.of(identifier));
             }
         }
 
@@ -226,6 +229,17 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable {
 
     @Override
     public Text getDisplayName() {
-        return getCustomName();
+        MutableText text = getCustomName().shallowCopy();
+
+        Profession profession = getSettlerData().getProfession();
+        if (profession != VillagesProfessions.NONE) {
+            text = text.append(" - ").append(new TranslatableText(getSettlerData().getProfession().getTranslationKey()));
+        }
+
+        return text;
+    }
+
+    public List<PrioritizedGoal> getRunningGoals() {
+        return goalSelector.getRunningGoals().collect(Collectors.toUnmodifiableList());
     }
 }

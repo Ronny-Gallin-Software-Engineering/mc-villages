@@ -8,7 +8,6 @@ import net.fabricmc.api.Environment;
 @Environment(EnvType.CLIENT)
 public class SettlerInfoScreen extends CottonClientScreen {
 
-
     public SettlerInfoScreen(SettlerEntity settler) {
         super(settler.getDisplayName(), new SettlerInfoGui(settler));
     }

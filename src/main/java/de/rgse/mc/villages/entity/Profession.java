@@ -1,14 +1,13 @@
 package de.rgse.mc.villages.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.util.Identifier;
 
+@AllArgsConstructor
 @Data
 public class Profession {
 
     private Identifier identifier;
-
-    public Profession(Identifier identifier){
-        this.identifier = identifier;
-    }
+    private String translationKey;
 }

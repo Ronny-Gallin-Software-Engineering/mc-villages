@@ -22,7 +22,7 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.util.registry.Registry;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class VillagesEntityRegistry {
+public class VillagesEntities {
 
     public static final EntityType<WandererEntity> WANDERER = Registry.register(Registry.ENTITY_TYPE, IdentifierUtil.create("wanderer"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WandererEntity::new)
@@ -40,16 +40,16 @@ public class VillagesEntityRegistry {
                     .build());
 
     public static void register() {
-        FabricDefaultAttributeRegistry.register(VillagesEntityRegistry.WANDERER, WandererEntity.createMobAttributes());
-        FabricDefaultAttributeRegistry.register(VillagesEntityRegistry.SETTLER, SettlerEntity.createMobAttributes());
-        FabricDefaultAttributeRegistry.register(VillagesEntityRegistry.LUMBERJACK, LumberjackEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(VillagesEntities.WANDERER, WandererEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(VillagesEntities.SETTLER, SettlerEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(VillagesEntities.LUMBERJACK, LumberjackEntity.createMobAttributes());
     }
 
     public static void registerClient() {
-        EntityRendererRegistry.register(VillagesEntityRegistry.WANDERER, WandererEntityRenderer::new);
-        EntityModelLayerRegistry.registerModelLayer(VillagesEntityModelLayerRegistry.WANDERER, () -> WandererEntityModel.getTexturedModelData(Dilation.NONE));
+        EntityRendererRegistry.register(VillagesEntities.WANDERER, WandererEntityRenderer::new);
+        EntityModelLayerRegistry.registerModelLayer(VillagesEntityModelLayers.WANDERER, () -> WandererEntityModel.getTexturedModelData(Dilation.NONE));
 
-        EntityRendererRegistry.register(VillagesEntityRegistry.SETTLER, ctx -> SettlerEntityRenderer.of(ctx, SettlerEntityModel.class));
-        EntityRendererRegistry.register(VillagesEntityRegistry.LUMBERJACK, ctx -> SettlerEntityRenderer.of(ctx, LumberjackEntityModel.class));
+        EntityRendererRegistry.register(VillagesEntities.SETTLER, ctx -> SettlerEntityRenderer.of(ctx, SettlerEntityModel.class));
+        EntityRendererRegistry.register(VillagesEntities.LUMBERJACK, ctx -> SettlerEntityRenderer.of(ctx, LumberjackEntityModel.class));
     }
 }

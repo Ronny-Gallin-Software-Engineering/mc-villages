@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 import net.minecraft.entity.ai.brain.Schedule;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class VillagesScheduleRegistry {
+public class VillagesSchedules {
 
     public static final Schedule LUMBERJACK = ScheduleAccessor.register(IdentifierUtil.createString("lumberjack_schedule"))
-            .withActivity(ClockUtil.seven(ClockUtil.MeridiemIndicator.AM), VillagesActivityRegistry.FIND_WOOD).build();
+            .withActivity(ClockUtil.seven(ClockUtil.MeridiemIndicator.AM), VillagesActivities.FIND_WOOD).build();
 
     public static void register(){}
 }

@@ -5,5 +5,13 @@
   "item.villages.coin_stack_item": "Stack of Coins",
 
   "item.villages.wanderer_spawn_egg": "Wanderer Spawn Egg",
-  "item.villages.lumberjack_spawn_egg": "Lumberjack Spawn Egg"
+  "item.villages.lumberjack_spawn_egg": "Lumberjack Spawn Egg",
+
+  "profession.villages.none": "",
+  "profession.villages.lumberjack": "Lumberjack",
+
+  "villages.gui.born": "Born",
+  "villages.gui.age": "Age",
+  "villages.gui.day": "Day",
+  "villages.gui.days": "Days"
 }

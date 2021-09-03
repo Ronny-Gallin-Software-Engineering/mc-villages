@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import net.minecraft.entity.ai.brain.ScheduleBuilder;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class VillagesTaskRegistry {
+public class VillagesTasks {
 
     public static void register() {
     }

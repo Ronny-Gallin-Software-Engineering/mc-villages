@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import net.minecraft.entity.ai.brain.Activity;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class VillagesActivityRegistry {
+public class VillagesActivities {
 
     public static final Activity FIND_WOOD = ActivityAccessor.register(IdentifierUtil.createString("find_wood"));
 

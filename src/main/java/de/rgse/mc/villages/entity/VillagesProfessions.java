@@ -9,10 +9,10 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class VillagesProfessionRegistry {
+public class VillagesProfessions {
 
-    public static final Profession NONE = new Profession(IdentifierUtil.profession("none"));
-    public static final Profession LUMBERJACK = new Profession(IdentifierUtil.profession("lumberjack"));
+    public static final Profession NONE = new Profession(IdentifierUtil.profession("none"), "profession.villages.none");
+    public static final Profession LUMBERJACK = new Profession(IdentifierUtil.profession("lumberjack"), "profession.villages.lumberjack");
 
     private static Registry<Profession> registry;
 

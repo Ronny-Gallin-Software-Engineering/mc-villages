@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import net.minecraft.entity.ai.brain.sensor.SensorType;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class VillagesSensorRegistry {
+public class VillagesSensors {
 
     public static final SensorType<TreeSensor> TREE_SENSOR = SensorTypeAccessor.register(IdentifierUtil.createString("tree_sensor"), () -> new TreeSensor(5, 32));
 

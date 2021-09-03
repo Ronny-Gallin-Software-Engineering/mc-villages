@@ -2,7 +2,7 @@ package de.rgse.mc.villages.goal;
 
 import de.rgse.mc.villages.entity.lumberjack.LumberjackEntity;
 import de.rgse.mc.villages.entity.settler.SettlerEntity;
-import de.rgse.mc.villages.task.VillagesModuleMemoryTypeRegistry;
+import de.rgse.mc.villages.task.VillagesModuleMemories;
 import net.minecraft.entity.ai.goal.MoveToTargetPosGoal;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldView;
@@ -17,13 +17,13 @@ public class CollectLogGoal extends MoveToTargetPosGoal {
 
     @Override
     public boolean canStart() {
-        Optional<BlockPos> optionalMemory = getMob().getBrain().getOptionalMemory(VillagesModuleMemoryTypeRegistry.KNOW_WOOD);
+        Optional<BlockPos> optionalMemory = getMob().getBrain().getOptionalMemory(VillagesModuleMemories.TREE);
         return optionalMemory.isPresent();
     }
 
     @Override
     protected boolean isTargetPos(WorldView world, BlockPos pos) {
-        Optional<BlockPos> optionalMemory = getMob().getBrain().getOptionalMemory(VillagesModuleMemoryTypeRegistry.KNOW_WOOD);
+        Optional<BlockPos> optionalMemory = getMob().getBrain().getOptionalMemory(VillagesModuleMemories.TREE);
 
         if (!optionalMemory.isPresent()) {
             return false;

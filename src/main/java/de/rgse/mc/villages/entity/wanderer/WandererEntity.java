@@ -1,8 +1,8 @@
 package de.rgse.mc.villages.entity.wanderer;
 
 import de.rgse.mc.villages.goal.MoveToCampfireGoal;
-import de.rgse.mc.villages.task.VillagesActivityRegistry;
-import de.rgse.mc.villages.task.VillagesModuleMemoryTypeRegistry;
+import de.rgse.mc.villages.task.VillagesActivities;
+import de.rgse.mc.villages.task.VillagesModuleMemories;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
@@ -27,32 +27,32 @@ public class WandererEntity extends PassiveEntity {
 
     public void setWanderTarget(BlockPos wanderTarget) {
         if (wanderTarget != null) {
-            brain.remember(VillagesModuleMemoryTypeRegistry.CAMPSITE, wanderTarget);
+            brain.remember(VillagesModuleMemories.CAMPSITE, wanderTarget);
 
         } else {
-            brain.forget(VillagesModuleMemoryTypeRegistry.CAMPSITE);
+            brain.forget(VillagesModuleMemories.CAMPSITE);
         }
     }
 
     public void setSettled(boolean settled) {
-        brain.remember(VillagesModuleMemoryTypeRegistry.SETTLED, settled);
+        brain.remember(VillagesModuleMemories.SETTLED, settled);
     }
 
     public BlockPos getWanderTarget() {
-        Optional<BlockPos> optionalMemory = brain.getOptionalMemory(VillagesModuleMemoryTypeRegistry.CAMPSITE);
+        Optional<BlockPos> optionalMemory = brain.getOptionalMemory(VillagesModuleMemories.CAMPSITE);
         return optionalMemory.orElse(null);
     }
 
     public boolean isSettled() {
-        return brain.getOptionalMemory(VillagesModuleMemoryTypeRegistry.SETTLED).orElse(false);
+        return brain.getOptionalMemory(VillagesModuleMemories.SETTLED).orElse(false);
     }
 
     private void initBrain(World world) {
         //brain.remember(VillagesModuleMemoryTypeRegistry.SAY_HELLO, true);
 
         //brain.setTaskList(VillagesActivityRegistry.GREET, 10, ImmutableList.of(new HelloTask()));
-        brain.setCoreActivities(Collections.singleton(VillagesActivityRegistry.GREET));
-        brain.setDefaultActivity(VillagesActivityRegistry.GREET);
+        brain.setCoreActivities(Collections.singleton(VillagesActivities.GREET));
+        brain.setDefaultActivity(VillagesActivities.GREET);
         brain.resetPossibleActivities();
         brain.refreshActivities(world.getTimeOfDay(), world.getTime());
     }

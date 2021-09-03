@@ -1,7 +1,8 @@
 package de.rgse.mc.villages.sensor;
 
 import de.rgse.mc.villages.block.PillarBlockEntity;
-import de.rgse.mc.villages.task.VillagesModuleMemoryTypeRegistry;
+import de.rgse.mc.villages.pattern.TreePattern;
+import de.rgse.mc.villages.task.VillagesModuleMemories;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
@@ -37,98 +38,68 @@ public class TreeSensor extends Sensor<LivingEntity> {
 
     @Override
     protected void sense(ServerWorld world, LivingEntity entity) {
-        Optional<BlockPos> optionalMemory = entity.getBrain().getOptionalMemory(VillagesModuleMemoryTypeRegistry.KNOW_WOOD);
+        Optional<BlockPos> treeMemory = entity.getBrain().getOptionalMemory(VillagesModuleMemories.TREE);
 
-        if (optionalMemory.isPresent()) {
-            BlockPos blockPos = optionalMemory.get();
-            BlockState rememberedBlock = world.getBlockState(blockPos);
-            if (match(rememberedBlock)) {
+        if (treeMemory.isPresent()) {
+            BlockPos rememberedPosition = treeMemory.get();
+            BlockState rememberedBlock = world.getBlockState(rememberedPosition);
+            if (isRequiredBlockType(rememberedBlock)) {
                 return;
             }
         }
 
         for (int i = 0; i <= sampleCount; i++) {
-            BlockPos blockPos = entity.getBlockPos().mutableCopy();
+            BlockPos sample = getSample(entity);
 
-            int x = random.nextInt(radiusHorizontal);
-            int y = random.nextInt(radiusVertical);
-            int z = random.nextInt(radiusHorizontal);
+            BlockState blockState = world.getBlockState(sample);
 
-            if (random.nextBoolean()) {
-                blockPos = blockPos.west(x);
-            } else {
-                blockPos = blockPos.east(x);
-            }
+            if (isRequiredBlockType(blockState)) {
+                TreePattern treePattern = new TreePattern(world);
+                PillarBlockEntity blockEntity = (PillarBlockEntity) world.getBlockEntity(sample);
 
-            if (random.nextBoolean()) {
-                blockPos = blockPos.north(z);
-            } else {
-                blockPos = blockPos.south(z);
-            }
-
-            if (random.nextBoolean()) {
-                blockPos = blockPos.up(y);
-            } else {
-                blockPos = blockPos.south(y);
-            }
-
-            BlockState blockState = world.getBlockState(blockPos);
-            boolean blockFound = match(blockState);
-
-            if (blockFound) {
-                PillarBlockEntity blockEntity = (PillarBlockEntity) world.getBlockEntity(blockPos);
-                if (blockEntity != null && blockEntity.isNaturallyGenerated()) {
-                    BlockPos root = getRoot(blockState, blockPos, world);
-                    entity.getBrain().remember(VillagesModuleMemoryTypeRegistry.KNOW_WOOD, root);
+                if (blockEntity != null && blockEntity.isNaturallyGenerated() && treePattern.matches(sample)) {
+                    entity.getBrain().remember(VillagesModuleMemories.TREE, TreePattern.normaliseSample(sample, world));
                     break;
                 }
             }
         }
     }
 
-    private boolean match(BlockState blockState) {
+    private BlockPos getSample(LivingEntity entity) {
+        BlockPos sample = entity.getBlockPos().mutableCopy();
+
+        int x = random.nextInt(radiusHorizontal);
+        int y = random.nextInt(radiusVertical);
+        int z = random.nextInt(radiusHorizontal);
+
+        if (random.nextBoolean()) {
+            sample = sample.west(x);
+        } else {
+            sample = sample.east(x);
+        }
+
+        if (random.nextBoolean()) {
+            sample = sample.north(z);
+        } else {
+            sample = sample.south(z);
+        }
+
+        if (random.nextBoolean()) {
+            sample = sample.up(y);
+        } else {
+            sample = sample.south(y);
+        }
+
+        return sample;
+    }
+
+    private boolean isRequiredBlockType(BlockState blockState) {
         return BLOCK.contains(blockState.getBlock());
     }
 
     @Override
     public Set<MemoryModuleType<?>> getOutputMemoryModules() {
-        return Set.of(VillagesModuleMemoryTypeRegistry.KNOW_WOOD);
+        return Set.of(VillagesModuleMemories.TREE);
     }
 
-    private BlockPos getRoot(BlockState blockState, BlockPos blockPos, ServerWorld world) {
-        BlockPos beneath = blockPos.down();
-        BlockState blockStateBeneath = world.getBlockState(beneath);
-
-        if (blockStateBeneath.isOf(blockState.getBlock())) {
-            return getRoot(blockState, beneath, world);
-
-        }
-
-        BlockPos adjacentPos = beneath.west();
-        BlockState adjacentBlock = world.getBlockState(beneath.west());
-        if (adjacentBlock.isOf(blockState.getBlock())) {
-            return getRoot(blockState, adjacentPos, world);
-        }
-
-        adjacentPos = beneath.east();
-        adjacentBlock = world.getBlockState(beneath.west());
-        if (adjacentBlock.isOf(blockState.getBlock())) {
-            return getRoot(blockState, adjacentPos, world);
-        }
-
-        adjacentPos = beneath.north();
-        adjacentBlock = world.getBlockState(beneath.west());
-        if (adjacentBlock.isOf(blockState.getBlock())) {
-            return getRoot(blockState, adjacentPos, world);
-        }
-
-
-        adjacentPos = beneath.south();
-        adjacentBlock = world.getBlockState(beneath.west());
-        if (adjacentBlock.isOf(blockState.getBlock())) {
-            return getRoot(blockState, adjacentPos, world);
-        }
-
-        return blockPos;
-    }
 }

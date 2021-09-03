@@ -1,7 +1,7 @@
 package de.rgse.mc.villages.sensor;
 
 import de.rgse.mc.villages.entity.settler.SettlerEntity;
-import de.rgse.mc.villages.task.VillagesModuleMemoryTypeRegistry;
+import de.rgse.mc.villages.task.VillagesModuleMemories;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
@@ -36,7 +36,7 @@ public class BlockSensor extends Sensor<SettlerEntity> {
 
     @Override
     protected void sense(ServerWorld world, SettlerEntity entity) {
-        Optional<BlockPos> optionalMemory = entity.getBrain().getOptionalMemory(VillagesModuleMemoryTypeRegistry.KNOW_WOOD);
+        Optional<BlockPos> optionalMemory = entity.getBrain().getOptionalMemory(VillagesModuleMemories.TREE);
 
         if (optionalMemory.isPresent()) {
             BlockPos blockPos = optionalMemory.get();
@@ -75,7 +75,7 @@ public class BlockSensor extends Sensor<SettlerEntity> {
             boolean blockFound = match(blockState);
 
             if (blockFound) {
-                entity.getBrain().remember(VillagesModuleMemoryTypeRegistry.KNOW_WOOD, blockPos);
+                entity.getBrain().remember(VillagesModuleMemories.TREE, blockPos);
                 break;
             }
         }
@@ -87,7 +87,7 @@ public class BlockSensor extends Sensor<SettlerEntity> {
 
     @Override
     public Set<MemoryModuleType<?>> getOutputMemoryModules() {
-        return Set.of(VillagesModuleMemoryTypeRegistry.KNOW_WOOD);
+        return Set.of(VillagesModuleMemories.TREE);
     }
 
 }

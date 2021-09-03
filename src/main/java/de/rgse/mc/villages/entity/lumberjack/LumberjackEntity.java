@@ -1,10 +1,10 @@
 package de.rgse.mc.villages.entity.lumberjack;
 
-import de.rgse.mc.villages.entity.VillagesProfessionRegistry;
+import de.rgse.mc.villages.entity.VillagesProfessions;
 import de.rgse.mc.villages.entity.settler.SettlerEntity;
 import de.rgse.mc.villages.goal.MoveToTreeGoal;
-import de.rgse.mc.villages.sensor.VillagesSensorRegistry;
-import de.rgse.mc.villages.task.VillagesModuleMemoryTypeRegistry;
+import de.rgse.mc.villages.sensor.VillagesSensors;
+import de.rgse.mc.villages.task.VillagesModuleMemories;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
@@ -32,13 +32,13 @@ public class LumberjackEntity extends SettlerEntity implements IAnimatable {
     }
 
     protected void initBrain(World world) {
-        brain.remember(VillagesModuleMemoryTypeRegistry.KNOW_WOOD, Optional.empty());
+        brain.remember(VillagesModuleMemories.TREE, Optional.empty());
     }
 
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
         EntityData initialize = super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
-        setSettlerData(getSettlerData().withProfession(VillagesProfessionRegistry.LUMBERJACK));
+        setSettlerData(getSettlerData().withProfession(VillagesProfessions.LUMBERJACK));
         return initialize;
     }
 
@@ -55,6 +55,6 @@ public class LumberjackEntity extends SettlerEntity implements IAnimatable {
 
     @Override
     protected Brain.Profile<?> createBrainProfile() {
-        return Brain.createProfile(List.of(VillagesModuleMemoryTypeRegistry.KNOW_WOOD), List.of(VillagesSensorRegistry.TREE_SENSOR));
+        return Brain.createProfile(List.of(VillagesModuleMemories.TREE), List.of(VillagesSensors.TREE_SENSOR));
     }
 }
