@@ -1,13 +1,12 @@
 package de.rgse.mc.villages.util;
 
 import de.rgse.mc.villages.entity.settler.SettlerEntity;
+import de.rgse.mc.villages.particle.Applyable;
 import de.rgse.mc.villages.particle.VillagesParticleEffects;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.entity.Entity;
-import net.minecraft.particle.ParticleEffect;
 import net.minecraft.util.math.Vec3d;
-import org.apache.commons.lang3.StringUtils;
 import software.bernie.geckolib3.core.controller.AnimationController;
 
 import java.util.Random;
@@ -21,26 +20,30 @@ public class VillagesParticleUtil {
     public static AnimationController.IParticleListener<SettlerEntity> createParticleListener(Entity entity, int particleCount, Supplier<Float> velocitySupplier, int deviation) {
 
         return event -> {
-            ParticleEffect effect = VillagesParticleEffects.getEffect(event.effect);
-            int count = particleCount;
+            String[] split = event.effect.split(",");
 
-            if (null != effect && (StringUtils.isBlank(event.script) || ExpressionUtil.instance().evaluateEntity(entity, event.script))) {
-                Vec3d up = entity.getPos().add(0, 2, 0);
+            for (String effectName : split) {
+                Applyable effect = VillagesParticleEffects.getEffect(effectName);
+                int count = particleCount;
 
-                while (count-- > 0) {
-                    float vx = velocitySupplier.get();
-                    float vy = velocitySupplier.get();
-                    float vz = velocitySupplier.get();
+                if (null != effect && effect.isApplyable(entity)) {
+                    Vec3d up = entity.getPos().add(0, 2, 0);
 
-                    double ox = RANDOM.nextInt(deviation) * .1f;
-                    double oy = RANDOM.nextInt(deviation) * .1f;
-                    double oz = RANDOM.nextInt(deviation) * .1f;
+                    while (count-- > 0) {
+                        float vx = velocitySupplier.get();
+                        float vy = velocitySupplier.get();
+                        float vz = velocitySupplier.get();
 
-                    ox = RANDOM.nextBoolean() ? ox * -1 : ox;
-                    oy = RANDOM.nextBoolean() ? oy * -1 : oy;
-                    oz = RANDOM.nextBoolean() ? oz * -1 : oz;
+                        double ox = RANDOM.nextInt(deviation) * .1f;
+                        double oy = RANDOM.nextInt(deviation) * .1f;
+                        double oz = RANDOM.nextInt(deviation) * .1f;
 
-                    entity.getEntityWorld().addParticle(VillagesParticleEffects.GRUPY_PARTICLE_EFFECT, ox + up.getX(), oy + up.getY(), oz + up.getZ(), vx, vy, vz);
+                        ox = RANDOM.nextBoolean() ? ox * -1 : ox;
+                        oy = RANDOM.nextBoolean() ? oy * -1 : oy;
+                        oz = RANDOM.nextBoolean() ? oz * -1 : oz;
+
+                        entity.getEntityWorld().addParticle(VillagesParticleEffects.SAD_PARTICLE_EFFECT.getEffect(), ox + up.getX(), oy + up.getY(), oz + up.getZ(), vx, vy, vz);
+                    }
                 }
             }
         };

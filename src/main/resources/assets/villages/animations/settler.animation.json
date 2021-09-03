@@ -511,7 +511,7 @@
 		},
 		"animation.villages:settler.idle_0": {
 			"loop": true,
-			"animation_length": 8,
+			"animation_length": 8.08333,
 			"bones": {
 				"left_upper_leg": {
 					"rotation": {
@@ -737,9 +737,6 @@
 					"effect": "sad_cloud"
 				},
 				"7.5": {
-					"effect": "sad_cloud"
-				},
-				"8.0": {
 					"effect": "sad_cloud"
 				}
 			}

@@ -5,11 +5,14 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "ActivityAccessor",
+    "BlocksMixin",
+    "GenericBlockStateMixin",
     "MemoryModuleTypeAccessor",
     "PointOfInterestTypeAccessor",
+    "RegistryAccessor",
     "ScheduleAccessor",
     "SensorTypeAccessor",
-    "RegistryAccessor"
+    "TrunkPlacerMixin"
   ],
   "client": [],
   "server": [],

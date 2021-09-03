@@ -1,6 +1,5 @@
 package de.rgse.mc.villages.entity.settler;
 
-import de.rgse.mc.villages.entity.VillagesProfessionRegistry;
 import de.rgse.mc.villages.util.IdentifierUtil;
 import net.minecraft.util.Identifier;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
@@ -14,7 +13,13 @@ public class SettlerEntityModel extends AnimatedGeoModel<SettlerEntity> {
 
     @Override
     public Identifier getTextureLocation(SettlerEntity settler) {
-        return IdentifierUtil.texture().entity().named("settler/settler.png");
+        SettlerData settlerData = settler.getSettlerData();
+        IdentifierUtil.IdentifierBuilder builder = IdentifierUtil.texture().entity().gender(settlerData.getGender());
+        if (settlerData.getMood().isSad()) {
+            return builder.formatted("settler/settler_{gender}_sad.png");
+        } else {
+            return builder.formatted("settler/settler_{gender}.png");
+        }
     }
 
     @Override

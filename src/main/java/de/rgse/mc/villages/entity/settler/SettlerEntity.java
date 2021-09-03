@@ -6,6 +6,7 @@ import de.rgse.mc.villages.entity.EntityName;
 import de.rgse.mc.villages.entity.Gender;
 import de.rgse.mc.villages.entity.VillagesEntityRegistry;
 import de.rgse.mc.villages.entity.VillagesProfessionRegistry;
+import de.rgse.mc.villages.gui.SettlerInfoScreen;
 import de.rgse.mc.villages.text.NameText;
 import de.rgse.mc.villages.util.IdentifierUtil;
 import de.rgse.mc.villages.util.NameUtil;
@@ -13,9 +14,11 @@ import de.rgse.mc.villages.util.VillagesParticleUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.entity.ai.goal.FleeEntityGoal;
 import net.minecraft.entity.data.DataTracker;
@@ -27,6 +30,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -57,12 +61,20 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable {
         setCustomNameVisible(true);
     }
 
+    protected void initBrain(World world) {
+    }
+
     public SettlerData getSettlerData() {
         return this.dataTracker.get(SETTLER_DATA);
     }
 
     public void setSettlerData(SettlerData settlerData) {
         this.dataTracker.set(SETTLER_DATA, settlerData);
+    }
+
+    @Override
+    public float getBaseMovementSpeedMultiplier() {
+        return super.getBaseMovementSpeedMultiplier() * getSettlerData().getMood().getSpeedModifier();
     }
 
     @Nullable
@@ -126,7 +138,9 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable {
         Gender gender = Gender.random(world.toServerWorld());
         EntityName name = NameUtil.instance().createName(gender);
 
-        this.setSettlerData(this.getSettlerData().withProfession(VillagesProfessionRegistry.NONE).withGender(gender).withName(name));
+        long time = world.toServerWorld().getLevelProperties().getTime();
+
+        this.setSettlerData(this.getSettlerData().withProfession(VillagesProfessionRegistry.NONE).withGender(gender).withName(name).withBirthday(time));
 
         if (spawnReason == SpawnReason.BREEDING) {
             this.setSettlerData(this.getSettlerData().withProfession(VillagesProfessionRegistry.NONE));
@@ -195,12 +209,23 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable {
             if (this.isBaby()) {
                 return ActionResult.success(this.world.isClient);
             } else {
-                String env = player.world.isClient() ? "client" : "server";
-                VillagesMod.LOGGER.info("dialog between {} and {} on {}", player.getEntityName(), getEntityName(), env);
+                if (world.isClient) {
+                    MinecraftClient.getInstance().setScreen(new SettlerInfoScreen(this));
+                }
                 return ActionResult.success(this.world.isClient);
             }
         } else {
             return super.interactMob(player, hand);
         }
+    }
+
+    @Override
+    protected void mobTick() {
+        ((Brain<SettlerEntity>) this.getBrain()).tick((ServerWorld) this.world, this);
+    }
+
+    @Override
+    public Text getDisplayName() {
+        return getCustomName();
     }
 }

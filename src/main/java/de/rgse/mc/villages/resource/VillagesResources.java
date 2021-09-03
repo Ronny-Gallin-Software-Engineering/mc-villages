@@ -1,6 +1,5 @@
 package de.rgse.mc.villages.resource;
 
-import de.rgse.mc.villages.VillagesMod;
 import de.rgse.mc.villages.util.IdentifierUtil;
 import de.rgse.mc.villages.util.NameUtil;
 import lombok.AccessLevel;
@@ -14,7 +13,7 @@ import net.minecraft.util.Identifier;
 import java.util.Collection;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class Resources {
+public class VillagesResources {
 
     private static final SimpleSynchronousResourceReloadListener RESOURCE_LISTENER = new SimpleSynchronousResourceReloadListener() {
         @Override

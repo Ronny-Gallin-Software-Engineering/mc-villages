@@ -1,7 +1,12 @@
 package de.rgse.mc.villages.util;
 
+import de.rgse.mc.villages.entity.settler.SettlerEntity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.minecraft.world.World;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ClockUtil {
@@ -12,6 +17,17 @@ public class ClockUtil {
     public static final int NOON = 6000;
     public static final int DUSK = 13500;
     public static final int MIDNIGHT = 18000;
+
+    public static final BigDecimal MILLIS_PER_DAY = BigDecimal.valueOf(20 * 60 * 100);
+
+    public static int toDay(long ticks) {
+        return BigDecimal.valueOf(ticks).divide(MILLIS_PER_DAY, RoundingMode.DOWN).intValue();
+    }
+
+    public static int getAge(SettlerEntity settler) {
+        long time = settler.world.getTime();
+        return BigDecimal.valueOf(time - settler.getSettlerData().getBirthday()).divide(MILLIS_PER_DAY, RoundingMode.DOWN).intValue();
+    }
 
     public static int one(MeridiemIndicator afternoon) {
         return 7 * NORM + six(afternoon);
@@ -61,7 +77,7 @@ public class ClockUtil {
         return eleven(afternoon) + 1000;
     }
 
-    public static enum MeridiemIndicator {
+    public enum MeridiemIndicator {
         AM, PM
     }
 }

@@ -3,7 +3,6 @@ package de.rgse.mc.villages.entity.settler;
 import de.rgse.mc.villages.entity.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.network.PacketByteBuf;
@@ -21,6 +20,8 @@ public class SettlerData {
 
     private Mood mood;
 
+    private long birthday;
+
     public SettlerData() {
         this.gender = Gender.FEMALE;
         this.villagerName = null;
@@ -34,6 +35,7 @@ public class SettlerData {
             packetByteBuf.writeString(settlerData.villagerName.toString());
             packetByteBuf.writeString(settlerData.profession.getIdentifier().toString());
             packetByteBuf.writeString(settlerData.gender.toString());
+            packetByteBuf.writeLong(settlerData.birthday);
         }
 
         public SettlerData read(PacketByteBuf packetByteBuf) {
@@ -45,6 +47,7 @@ public class SettlerData {
             settlerData.villagerName = EntityName.parse(name);
             settlerData.gender = Gender.valueOf(genderString);
             settlerData.profession = VillagesProfessionRegistry.of(Identifier.tryParse(professionId));
+            settlerData.birthday = packetByteBuf.readLong();
 
             return settlerData;
         }
@@ -54,16 +57,20 @@ public class SettlerData {
         }
     };
 
+    public SettlerData withBirthday(long birthday) {
+        return new SettlerData(this.gender, this.villagerName, profession, this.mood, birthday);
+    }
+
     public SettlerData withProfession(Profession profession) {
-        return new SettlerData(this.gender, this.villagerName, profession, this.mood);
+        return new SettlerData(this.gender, this.villagerName, profession, this.mood, this.birthday);
     }
 
     public SettlerData withName(EntityName name) {
-        return new SettlerData(this.gender, name, this.profession, this.mood);
+        return new SettlerData(this.gender, name, this.profession, this.mood, this.birthday);
     }
 
     public SettlerData withGender(Gender gender) {
-        return new SettlerData(gender, this.villagerName, this.profession, this.mood);
+        return new SettlerData(gender, this.villagerName, this.profession, this.mood, this.birthday);
     }
 
     public static void register() {

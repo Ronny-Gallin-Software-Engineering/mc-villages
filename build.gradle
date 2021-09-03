@@ -15,6 +15,12 @@ repositories {
     // for more information about repositories.
 
      maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+     maven { url 'https://server.bbkr.space/artifactory/libs-release' }
+     maven { url 'https://jitpack.io'}
+     maven { url "https://repo.spongepowered.org/maven/"}
+     maven { url "https://maven.terraformersmc.com/"}
+     maven { url "https://maven.shedaniel.me/"}
+
 }
 
 idea {
@@ -35,7 +41,8 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     modImplementation 'software.bernie.geckolib:geckolib-fabric-1.17:3.0.13:dev'
-    modImplementation 'org.apache.commons:commons-jexl:2.1.1'
+    modImplementation 'io.github.cottonmc:LibGui:4.1.7+1.17.1'
+    modImplementation("com.gitlab.Lortseam:completeconfig:1.1.0")
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.

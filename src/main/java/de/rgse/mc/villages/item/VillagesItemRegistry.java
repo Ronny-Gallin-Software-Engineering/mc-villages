@@ -14,7 +14,7 @@ import net.minecraft.util.registry.Registry;
 public class VillagesItemRegistry {
 
     public static final Item COIN = new CoinItem(new FabricItemSettings().group(VillagesItemGroupRegistry.VILLAGES_ITEM_GROUP));
-    public static final Item COIN_STACK = new CoinItem(new FabricItemSettings().group(VillagesItemGroupRegistry.VILLAGES_ITEM_GROUP));
+    public static final Item COIN_STACK = new CoinStackItem(new FabricItemSettings().group(VillagesItemGroupRegistry.VILLAGES_ITEM_GROUP));
 
     public static final Item WANDERER_SPAWN_EGG = new SpawnEggItem(VillagesEntityRegistry.WANDERER, 12895428, 11382189, new Item.Settings().group(VillagesItemGroupRegistry.VILLAGES_ITEM_GROUP));
     public static final Item LUMBERJACK_SPAWN_EGG = new SpawnEggItem(VillagesEntityRegistry.LUMBERJACK, 123456, 654321, new Item.Settings().group(VillagesItemGroupRegistry.VILLAGES_ITEM_GROUP));

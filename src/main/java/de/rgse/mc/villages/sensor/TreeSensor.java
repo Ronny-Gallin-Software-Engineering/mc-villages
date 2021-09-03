@@ -1,12 +1,14 @@
 package de.rgse.mc.villages.sensor;
 
-import de.rgse.mc.villages.entity.settler.SettlerEntity;
+import de.rgse.mc.villages.block.PillarBlockEntity;
 import de.rgse.mc.villages.task.VillagesModuleMemoryTypeRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.sensor.Sensor;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.LogManager;
@@ -16,18 +18,17 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
-public class BlockSensor extends Sensor<SettlerEntity> {
+public class TreeSensor extends Sensor<LivingEntity> {
 
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final Tag.Identified<Block> BLOCK = BlockTags.LOGS;
 
     private final Random random = new Random();
-    private final Tag.Identified<Block> block;
     private final int radiusVertical;
     private final int radiusHorizontal;
     private final long sampleCount;
 
-    public BlockSensor(Tag.Identified<Block> block, int radiusVertical, int radiusHorizontal) {
-        this.block = block;
+    public TreeSensor(int radiusVertical, int radiusHorizontal) {
         this.radiusVertical = radiusVertical;
         this.radiusHorizontal = radiusHorizontal;
         long blockCount = 8L * (radiusHorizontal * radiusHorizontal * radiusVertical);
@@ -35,7 +36,7 @@ public class BlockSensor extends Sensor<SettlerEntity> {
     }
 
     @Override
-    protected void sense(ServerWorld world, SettlerEntity entity) {
+    protected void sense(ServerWorld world, LivingEntity entity) {
         Optional<BlockPos> optionalMemory = entity.getBrain().getOptionalMemory(VillagesModuleMemoryTypeRegistry.KNOW_WOOD);
 
         if (optionalMemory.isPresent()) {
@@ -75,14 +76,18 @@ public class BlockSensor extends Sensor<SettlerEntity> {
             boolean blockFound = match(blockState);
 
             if (blockFound) {
-                entity.getBrain().remember(VillagesModuleMemoryTypeRegistry.KNOW_WOOD, blockPos);
-                break;
+                PillarBlockEntity blockEntity = (PillarBlockEntity) world.getBlockEntity(blockPos);
+                if (blockEntity != null && blockEntity.isNaturallyGenerated()) {
+                    BlockPos root = getRoot(blockState, blockPos, world);
+                    entity.getBrain().remember(VillagesModuleMemoryTypeRegistry.KNOW_WOOD, root);
+                    break;
+                }
             }
         }
     }
 
     private boolean match(BlockState blockState) {
-        return block.contains(blockState.getBlock());
+        return BLOCK.contains(blockState.getBlock());
     }
 
     @Override
@@ -90,4 +95,40 @@ public class BlockSensor extends Sensor<SettlerEntity> {
         return Set.of(VillagesModuleMemoryTypeRegistry.KNOW_WOOD);
     }
 
+    private BlockPos getRoot(BlockState blockState, BlockPos blockPos, ServerWorld world) {
+        BlockPos beneath = blockPos.down();
+        BlockState blockStateBeneath = world.getBlockState(beneath);
+
+        if (blockStateBeneath.isOf(blockState.getBlock())) {
+            return getRoot(blockState, beneath, world);
+
+        }
+
+        BlockPos adjacentPos = beneath.west();
+        BlockState adjacentBlock = world.getBlockState(beneath.west());
+        if (adjacentBlock.isOf(blockState.getBlock())) {
+            return getRoot(blockState, adjacentPos, world);
+        }
+
+        adjacentPos = beneath.east();
+        adjacentBlock = world.getBlockState(beneath.west());
+        if (adjacentBlock.isOf(blockState.getBlock())) {
+            return getRoot(blockState, adjacentPos, world);
+        }
+
+        adjacentPos = beneath.north();
+        adjacentBlock = world.getBlockState(beneath.west());
+        if (adjacentBlock.isOf(blockState.getBlock())) {
+            return getRoot(blockState, adjacentPos, world);
+        }
+
+
+        adjacentPos = beneath.south();
+        adjacentBlock = world.getBlockState(beneath.west());
+        if (adjacentBlock.isOf(blockState.getBlock())) {
+            return getRoot(blockState, adjacentPos, world);
+        }
+
+        return blockPos;
+    }
 }

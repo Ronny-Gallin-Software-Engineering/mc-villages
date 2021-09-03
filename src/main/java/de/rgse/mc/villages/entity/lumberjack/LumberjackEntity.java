@@ -1,16 +1,14 @@
 package de.rgse.mc.villages.entity.lumberjack;
 
-import com.google.common.collect.ImmutableList;
-import com.mojang.datafixers.util.Pair;
 import de.rgse.mc.villages.entity.VillagesProfessionRegistry;
 import de.rgse.mc.villages.entity.settler.SettlerEntity;
+import de.rgse.mc.villages.goal.MoveToTreeGoal;
 import de.rgse.mc.villages.sensor.VillagesSensorRegistry;
-import de.rgse.mc.villages.task.*;
+import de.rgse.mc.villages.task.VillagesModuleMemoryTypeRegistry;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.brain.Brain;
-import net.minecraft.entity.ai.goal.WanderAroundGoal;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.ActionResult;
@@ -33,16 +31,8 @@ public class LumberjackEntity extends SettlerEntity implements IAnimatable {
         initBrain(world);
     }
 
-    private void initBrain(World world) {
-
-        Brain<LumberjackEntity> myBrain = (Brain<LumberjackEntity>) getBrain();
-        myBrain.remember(VillagesModuleMemoryTypeRegistry.KNOW_WOOD, Optional.empty());
-
-        myBrain.setSchedule(VillagesScheduleRegistry.LUMBERJACK);
-        myBrain.setTaskList(VillagesActivityRegistry.FIND_WOOD, ImmutableList.of(Pair.of(1, new WoodcutterTask())));
-
-        myBrain.resetPossibleActivities();
-        myBrain.refreshActivities(world.getTimeOfDay(), world.getTime());
+    protected void initBrain(World world) {
+        brain.remember(VillagesModuleMemoryTypeRegistry.KNOW_WOOD, Optional.empty());
     }
 
     @Override
@@ -55,7 +45,7 @@ public class LumberjackEntity extends SettlerEntity implements IAnimatable {
     @Override
     protected void initGoals() {
         super.initGoals();
-        this.goalSelector.add(2, new WanderAroundGoal(this, 0.4D * getSettlerData().getMood().getSpeedModifier(), 60));
+        this.goalSelector.add(2, new MoveToTreeGoal(this));
     }
 
     @Override
@@ -65,6 +55,6 @@ public class LumberjackEntity extends SettlerEntity implements IAnimatable {
 
     @Override
     protected Brain.Profile<?> createBrainProfile() {
-        return Brain.createProfile(List.of(VillagesModuleMemoryTypeRegistry.KNOW_WOOD), List.of(VillagesSensorRegistry.WOOD_SENSOR));
+        return Brain.createProfile(List.of(VillagesModuleMemoryTypeRegistry.KNOW_WOOD), List.of(VillagesSensorRegistry.TREE_SENSOR));
     }
 }

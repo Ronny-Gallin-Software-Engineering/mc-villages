@@ -31,12 +31,12 @@ public class VillagesEntityRegistry {
 
     public static final EntityType<SettlerEntity> SETTLER = Registry.register(Registry.ENTITY_TYPE, IdentifierUtil.create("settler"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, SettlerEntity::new)
-                    .dimensions(EntityDimensions.fixed(1f, 2f))
+                    .dimensions(EntityDimensions.fixed(.9f, 1.9f))
                     .build());
 
     public static final EntityType<LumberjackEntity> LUMBERJACK = Registry.register(Registry.ENTITY_TYPE, IdentifierUtil.create("lumberjack"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, LumberjackEntity::new)
-                    .dimensions(EntityDimensions.fixed(1f, 2f))
+                    .dimensions(EntityDimensions.fixed(.9f, 1.9f))
                     .build());
 
     public static void register() {

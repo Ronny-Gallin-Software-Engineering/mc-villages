@@ -11,5 +11,5 @@ import net.minecraft.item.ItemStack;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class VillagesItemGroupRegistry {
 
-    public static final ItemGroup VILLAGES_ITEM_GROUP = FabricItemGroupBuilder.build(IdentifierUtil.create("item_group"), () -> new ItemStack(VillagesItemRegistry.COIN));
+    public static final ItemGroup VILLAGES_ITEM_GROUP = FabricItemGroupBuilder.build(IdentifierUtil.create("general"), () -> new ItemStack(VillagesItemRegistry.COIN));
 }

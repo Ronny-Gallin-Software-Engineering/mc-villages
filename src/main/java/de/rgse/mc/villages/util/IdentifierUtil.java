@@ -44,6 +44,11 @@ public class IdentifierUtil {
             this.identifier = new StringBuilder(type + "/");
         }
 
+        public IdentifierBuilder item() {
+            identifier.append("item/");
+            return this;
+        }
+
         public IdentifierBuilder entity() {
             identifier.append("entity/");
             return this;
