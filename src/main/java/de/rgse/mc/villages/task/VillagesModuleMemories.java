@@ -11,4 +11,5 @@ public class VillagesModuleMemories {
     public static final MemoryModuleType<Boolean> SETTLED = MemoryModuleTypeAccessor.register(IdentifierUtil.createString("settled"));
 
     public static final MemoryModuleType<BlockPos> TREE = MemoryModuleTypeAccessor.register(IdentifierUtil.createString("tree"));
+    public static final MemoryModuleType<BlockPos> SAPLING = MemoryModuleTypeAccessor.register(IdentifierUtil.createString("sapling"));
 }

@@ -1,5 +1,6 @@
 package de.rgse.mc.villages.goal;
 
+import de.rgse.mc.villages.VillagesMod;
 import de.rgse.mc.villages.entity.lumberjack.LumberjackEntity;
 import de.rgse.mc.villages.entity.settler.SettlerEntity;
 import de.rgse.mc.villages.task.VillagesModuleMemories;
@@ -21,6 +22,12 @@ public class MoveToTreeGoal extends MoveToTargetPosGoal {
     public boolean canStart() {
         Optional<BlockPos> optionalMemory = getMob().getBrain().getOptionalMemory(VillagesModuleMemories.TREE);
         return optionalMemory.isPresent() && !isAtTree(optionalMemory.get()) && super.canStart();
+    }
+
+    @Override
+    public void start() {
+        VillagesMod.LOGGER.info("{} move to tree", getMob().getSettlerData().getVillagerName());
+        super.start();
     }
 
     private boolean isAtTree(BlockPos tree) {

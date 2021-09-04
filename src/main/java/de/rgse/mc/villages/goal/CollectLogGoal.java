@@ -1,5 +1,6 @@
 package de.rgse.mc.villages.goal;
 
+import de.rgse.mc.villages.VillagesMod;
 import de.rgse.mc.villages.entity.lumberjack.LumberjackEntity;
 import de.rgse.mc.villages.entity.settler.SettlerEntity;
 import de.rgse.mc.villages.task.VillagesModuleMemories;
@@ -19,6 +20,12 @@ public class CollectLogGoal extends MoveToTargetPosGoal {
     public boolean canStart() {
         Optional<BlockPos> optionalMemory = getMob().getBrain().getOptionalMemory(VillagesModuleMemories.TREE);
         return optionalMemory.isPresent();
+    }
+
+    @Override
+    public void start() {
+        VillagesMod.LOGGER.info("{} collects logs", getMob().getSettlerData().getVillagerName());
+        super.start();
     }
 
     @Override

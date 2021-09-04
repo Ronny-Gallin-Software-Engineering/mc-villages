@@ -2,6 +2,7 @@ package de.rgse.mc.villages.util;
 
 import de.rgse.mc.villages.VillagesMod;
 import de.rgse.mc.villages.entity.Gender;
+import de.rgse.mc.villages.entity.Profession;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.util.Identifier;
@@ -33,6 +34,10 @@ public class IdentifierUtil {
 
     public static String createString(String value) {
         return String.join(":", VillagesMod.MOD_ID, value);
+    }
+
+    public static Identifier skill(Profession profession) {
+        return new Identifier(VillagesMod.MOD_ID, profession.getIdentifier().toString() + "_skill");
     }
 
     public static class IdentifierBuilder {

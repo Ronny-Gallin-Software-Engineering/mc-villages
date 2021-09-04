@@ -1,6 +1,8 @@
 package de.rgse.mc.villages.entity.settler;
 
 import de.rgse.mc.villages.entity.*;
+import de.rgse.mc.villages.skill.Skill;
+import de.rgse.mc.villages.skill.Skills;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.entity.data.TrackedDataHandler;
@@ -18,7 +20,8 @@ public class SettlerData {
     private Mood mood;
     private long birthday;
     private float defaultMovementSpeed;
-
+    private float viewDistance;
+    private Skills skills;
 
     public SettlerData() {
         this.gender = Gender.FEMALE;
@@ -26,6 +29,8 @@ public class SettlerData {
         this.profession = VillagesProfessions.NONE;
         this.mood = new Mood();
         this.defaultMovementSpeed = .4f;
+        this.viewDistance = 32f;
+        this.skills = new Skills();
     }
 
     public static final TrackedDataHandler<SettlerData> SETTLER_DATA = new TrackedDataHandler<>() {
@@ -36,6 +41,9 @@ public class SettlerData {
             packetByteBuf.writeString(settlerData.gender.toString());
             packetByteBuf.writeLong(settlerData.birthday);
             packetByteBuf.writeFloat(settlerData.defaultMovementSpeed);
+            packetByteBuf.writeFloat(settlerData.viewDistance);
+            packetByteBuf.writeFloat(settlerData.viewDistance);
+            packetByteBuf.writeNbt(settlerData.skills.toNbt());
         }
 
         public SettlerData read(PacketByteBuf packetByteBuf) {
@@ -49,6 +57,8 @@ public class SettlerData {
             settlerData.profession = VillagesProfessions.of(Identifier.tryParse(professionId));
             settlerData.birthday = packetByteBuf.readLong();
             settlerData.defaultMovementSpeed = packetByteBuf.readFloat();
+            settlerData.viewDistance = packetByteBuf.readFloat();
+            settlerData.skills = Skills.fromNbt(packetByteBuf.readNbt());
 
             return settlerData;
         }
@@ -59,23 +69,28 @@ public class SettlerData {
     };
 
     public SettlerData withBirthday(long birthday) {
-        return new SettlerData(this.gender, this.villagerName, profession, this.mood, birthday, this.defaultMovementSpeed);
+        return new SettlerData(this.gender, this.villagerName, profession, this.mood, birthday, this.defaultMovementSpeed, this.viewDistance, this.skills);
     }
 
     public SettlerData withProfession(Profession profession) {
-        return new SettlerData(this.gender, this.villagerName, profession, this.mood, this.birthday, this.defaultMovementSpeed);
+        return new SettlerData(this.gender, this.villagerName, profession, this.mood, this.birthday, this.defaultMovementSpeed, this.viewDistance, this.skills);
     }
 
     public SettlerData withName(EntityName name) {
-        return new SettlerData(this.gender, name, this.profession, this.mood, this.birthday, this.defaultMovementSpeed);
+        return new SettlerData(this.gender, name, this.profession, this.mood, this.birthday, this.defaultMovementSpeed, this.viewDistance, this.skills);
     }
 
     public SettlerData withGender(Gender gender) {
-        return new SettlerData(gender, this.villagerName, this.profession, this.mood, this.birthday, this.defaultMovementSpeed);
+        return new SettlerData(gender, this.villagerName, this.profession, this.mood, this.birthday, this.defaultMovementSpeed, this.viewDistance, this.skills);
     }
 
     public SettlerData withDefaultMovementSpeed(float speed) {
-        return new SettlerData(gender, this.villagerName, this.profession, this.mood, this.birthday, speed);
+        return new SettlerData(gender, this.villagerName, this.profession, this.mood, this.birthday, speed, this.viewDistance, this.skills);
+    }
+
+    public SettlerData withSkill(Skill skill) {
+        this.skills.setOrReplace(skill);
+        return new SettlerData(gender, this.villagerName, this.profession, this.mood, this.birthday, this.defaultMovementSpeed, this.viewDistance, this.skills);
     }
 
     public static void register() {

@@ -12,9 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.EntityData;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.*;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.entity.ai.goal.FleeEntityGoal;
@@ -24,9 +22,11 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.mob.*;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -51,10 +51,11 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class SettlerEntity extends PassiveEntity implements IAnimatable {
+public class SettlerEntity extends PassiveEntity implements IAnimatable, InventoryOwner {
 
     private static final TrackedData<SettlerData> SETTLER_DATA = DataTracker.registerData(SettlerEntity.class, SettlerData.SETTLER_DATA);
     private final AnimationFactory animationFactory = new AnimationFactory(this);
+    private SimpleInventory inventory = new SimpleInventory(5);
 
     public SettlerEntity(EntityType<? extends SettlerEntity> entityType, World world) {
         super(entityType, world);
@@ -62,6 +63,7 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable {
         this.setSettlerData(this.getSettlerData());
         setCustomNameVisible(true);
         setMovementSpeed(.4f);
+        setCanPickUpLoot(true);
     }
 
     protected void initBrain(World world) {
@@ -174,6 +176,8 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable {
             villageNbt.putString(IdentifierUtil.createString("profession"), settlerData.getProfession().getIdentifier().toString());
         }
 
+        nbt.put("iventory", inventory.toNbtList());
+
         nbt.put(VillagesMod.MOD_ID, villageNbt);
     }
 
@@ -200,6 +204,9 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable {
                 settlerData.setProfession(VillagesProfessions.of(identifier));
             }
         }
+
+        this.inventory.readNbtList(nbt.getList("Inventory", NbtElement.LIST_TYPE));
+
 
         setCustomName(NameText.of(this));
         setCustomNameVisible(true);
@@ -237,6 +244,41 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable {
         }
 
         return text;
+    }
+
+    @Override
+    public boolean canPickupItem(ItemStack stack) {
+        return stack.isFood();
+    }
+
+    @Override
+    public boolean canPickUpLoot() {
+        return !isBaby();
+    }
+
+    @Override
+    protected void loot(ItemEntity item) {
+        ItemStack itemStack = item.getStack();
+        if (this.canGather(itemStack)) {
+            SimpleInventory simpleInventory = this.getInventory();
+            boolean bl = simpleInventory.canInsert(itemStack);
+            if (!bl) {
+                return;
+            }
+
+            this.triggerItemPickedUpByEntityCriteria(item);
+            this.sendPickup(item, itemStack.getCount());
+            ItemStack itemStack2 = simpleInventory.addStack(itemStack);
+            if (itemStack2.isEmpty()) {
+                item.discard();
+            } else {
+                itemStack.setCount(itemStack2.getCount());
+            }
+        }
+    }
+
+    public SimpleInventory getInventory() {
+        return inventory;
     }
 
     public List<PrioritizedGoal> getRunningGoals() {

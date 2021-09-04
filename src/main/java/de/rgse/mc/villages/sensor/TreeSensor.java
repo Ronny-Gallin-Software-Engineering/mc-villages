@@ -1,8 +1,10 @@
 package de.rgse.mc.villages.sensor;
 
 import de.rgse.mc.villages.block.PillarBlockEntity;
+import de.rgse.mc.villages.entity.settler.SettlerEntity;
 import de.rgse.mc.villages.pattern.TreePattern;
 import de.rgse.mc.villages.task.VillagesModuleMemories;
+import lombok.NoArgsConstructor;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
@@ -19,25 +21,21 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
-public class TreeSensor extends Sensor<LivingEntity> {
+@NoArgsConstructor
+public class TreeSensor extends Sensor<SettlerEntity> {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Tag.Identified<Block> BLOCK = BlockTags.LOGS;
 
     private final Random random = new Random();
-    private final int radiusVertical;
-    private final int radiusHorizontal;
-    private final long sampleCount;
-
-    public TreeSensor(int radiusVertical, int radiusHorizontal) {
-        this.radiusVertical = radiusVertical;
-        this.radiusHorizontal = radiusHorizontal;
-        long blockCount = 8L * (radiusHorizontal * radiusHorizontal * radiusVertical);
-        sampleCount = blockCount / 20;
-    }
 
     @Override
-    protected void sense(ServerWorld world, LivingEntity entity) {
+    protected void sense(ServerWorld world, SettlerEntity entity) {
+        int radiusHorizontal = (int) entity.getSettlerData().getViewDistance();
+        int radiusVertical = radiusHorizontal / 2;
+        long blockCount = 8L * (radiusHorizontal * radiusHorizontal * radiusVertical);
+        long sampleCount = blockCount / 20;
+
         Optional<BlockPos> treeMemory = entity.getBrain().getOptionalMemory(VillagesModuleMemories.TREE);
 
         if (treeMemory.isPresent()) {
@@ -49,7 +47,7 @@ public class TreeSensor extends Sensor<LivingEntity> {
         }
 
         for (int i = 0; i <= sampleCount; i++) {
-            BlockPos sample = getSample(entity);
+            BlockPos sample = getSample(entity, radiusHorizontal, radiusVertical);
 
             BlockState blockState = world.getBlockState(sample);
 
@@ -65,7 +63,7 @@ public class TreeSensor extends Sensor<LivingEntity> {
         }
     }
 
-    private BlockPos getSample(LivingEntity entity) {
+    private BlockPos getSample(LivingEntity entity, int radiusHorizontal, int radiusVertical) {
         BlockPos sample = entity.getBlockPos().mutableCopy();
 
         int x = random.nextInt(radiusHorizontal);
