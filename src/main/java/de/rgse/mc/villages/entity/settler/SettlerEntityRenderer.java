@@ -18,7 +18,7 @@ public class SettlerEntityRenderer extends GeoEntityRenderer<SettlerEntity> {
 
     @Override
     public void renderRecursively(GeoBone bone, MatrixStack stack, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-        /*if(bone.getName().equals("right_hand")) {
+        if (bone.getName().equals("right_hand")) {
             stack.push();
             //You'll need to play around with these to get item to render in the correct orientation
             stack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-75));
@@ -32,8 +32,8 @@ public class SettlerEntityRenderer extends GeoEntityRenderer<SettlerEntity> {
             MinecraftClient.getInstance().getItemRenderer().renderItem(mainHand, ModelTransformation.Mode.THIRD_PERSON_RIGHT_HAND, packedLightIn, packedOverlayIn, stack, this.rtb, 0);
             stack.pop();
             bufferIn = rtb.getBuffer(RenderLayer.getEntityTranslucent(whTexture));
-        }*/
-        if(bone.getName().equals("left_hand")) {
+        }
+        if (bone.getName().equals("left_hand")) {
             stack.push();
             //You'll need to play around with these to get item to render in the correct orientation
             stack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(75));
@@ -48,16 +48,16 @@ public class SettlerEntityRenderer extends GeoEntityRenderer<SettlerEntity> {
             stack.pop();
             bufferIn = rtb.getBuffer(RenderLayer.getEntityTranslucent(whTexture));
         }
-        if(bone.getName().equals("core")) {
+        if (bone.getName().equals("core")) {
             // not yet
         }
-        if(bone.getName().equals("hip")) {
+        if (bone.getName().equals("hip")) {
             // not yet
         }
-        if(bone.getName().endsWith("lower_leg")) {
-           // not yet
+        if (bone.getName().endsWith("lower_leg")) {
+            // not yet
         }
-        if(bone.getName().endsWith("head")) {
+        if (bone.getName().endsWith("head")) {
             // not yet
         }
 

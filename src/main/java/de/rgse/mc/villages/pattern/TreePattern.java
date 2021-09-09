@@ -8,22 +8,17 @@ import net.minecraft.world.World;
 
 public class TreePattern implements Pattern {
 
-    private final World world;
     private final int minHeight = 3;
 
-    public TreePattern(World world) {
-        this.world = world;
-    }
-
     @Override
-    public boolean matches(BlockPos sample) {
+    public boolean matches(BlockPos sample, World world) {
         BlockPos root = normaliseSample(sample, world);
         BlockState rootState = world.getBlockState(root);
 
         if (isLog(rootState)) {
             BlockPos nextLevelLog = root;
             for (int i = 1; i < minHeight; i++) {
-                nextLevelLog = getNextLevelLog(nextLevelLog, rootState.getBlock());
+                nextLevelLog = getNextLevelLog(nextLevelLog, rootState.getBlock(), world);
                 if (nextLevelLog == null) {
                     return false;
                 }
@@ -39,7 +34,25 @@ public class TreePattern implements Pattern {
         return getRoot(blockState, sample, world);
     }
 
-    private BlockPos getNextLevelLog(BlockPos blockPos, Block block) {
+    public static int getTreeSize(BlockPos sample, World world) {
+        BlockPos root = normaliseSample(sample, world);
+        BlockState rootState = world.getBlockState(root);
+
+        int count = 0;
+
+        if (isLog(rootState)) {
+            BlockPos nextLevelLog = root;
+            do {
+                count++;
+                nextLevelLog = getNextLevelLog(nextLevelLog, rootState.getBlock(), world);
+
+            } while (nextLevelLog != null);
+        }
+
+        return count;
+    }
+
+    public static BlockPos getNextLevelLog(BlockPos blockPos, Block block, World world) {
         BlockPos center = blockPos.up();
 
         if (world.getBlockState(center).isOf(block)) {
@@ -89,7 +102,7 @@ public class TreePattern implements Pattern {
         return null;
     }
 
-    private boolean isLog(BlockState blockState) {
+    public static boolean isLog(BlockState blockState) {
         return BlockTags.LOGS.contains(blockState.getBlock());
     }
 

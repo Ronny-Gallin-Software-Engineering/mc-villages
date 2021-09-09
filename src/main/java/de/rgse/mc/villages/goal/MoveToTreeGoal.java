@@ -1,18 +1,23 @@
 package de.rgse.mc.villages.goal;
 
-import de.rgse.mc.villages.VillagesMod;
 import de.rgse.mc.villages.entity.lumberjack.LumberjackEntity;
 import de.rgse.mc.villages.entity.settler.SettlerEntity;
-import de.rgse.mc.villages.task.VillagesModuleMemories;
+import de.rgse.mc.villages.network.VillagesNetwork;
+import de.rgse.mc.villages.task.VillagesMemories;
 import de.rgse.mc.villages.util.BlockUtil;
+import de.rgse.mc.villages.util.IdentifierUtil;
 import net.minecraft.entity.ai.goal.MoveToTargetPosGoal;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldView;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Optional;
 
 public class MoveToTreeGoal extends MoveToTargetPosGoal {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public MoveToTreeGoal(LumberjackEntity mob) {
         super(mob, mob.getSettlerData().getDefaultMovementSpeed(), 100);
@@ -20,31 +25,34 @@ public class MoveToTreeGoal extends MoveToTargetPosGoal {
 
     @Override
     public boolean canStart() {
-        Optional<BlockPos> optionalMemory = getMob().getBrain().getOptionalMemory(VillagesModuleMemories.TREE);
-        return optionalMemory.isPresent() && !isAtTree(optionalMemory.get()) && super.canStart();
+        Optional<BlockPos> optionalMemory = getMob().getBrain().getOptionalMemory(VillagesMemories.TREE);
+        return optionalMemory.isPresent() && super.canStart();
     }
 
     @Override
     public void start() {
-        VillagesMod.LOGGER.info("{} move to tree", getMob().getSettlerData().getVillagerName());
+        LOGGER.info("{} start", getMob().getSettlerData().getVillagerName());
+        VillagesNetwork.notifyStartTask(getMob(), IdentifierUtil.goal(this));
         super.start();
     }
 
-    private boolean isAtTree(BlockPos tree) {
-        List<BlockPos> surroundingBlocks = BlockUtil.getSurroundingBlocks(getMob().getBlockPos(), 1);
-        return surroundingBlocks.stream().anyMatch(bp -> bp.equals(tree));
+    @Override
+    public void stop() {
+        LOGGER.info("{} stop", getMob().getSettlerData().getVillagerName());
+        VillagesNetwork.notifyStopTask(getMob(), IdentifierUtil.goal(this));
+        super.stop();
     }
 
     @Override
     protected boolean isTargetPos(WorldView world, BlockPos pos) {
-        Optional<BlockPos> optionalMemory = getMob().getBrain().getOptionalMemory(VillagesModuleMemories.TREE);
+        Optional<BlockPos> optionalMemory = getMob().getBrain().getOptionalMemory(VillagesMemories.TREE);
 
         if (!optionalMemory.isPresent()) {
             return false;
         }
 
         BlockPos blockPos = optionalMemory.get();
-        return blockPos.equals(pos);
+        return blockPos.getX() == pos.getX() && blockPos.getZ() == pos.getZ();
     }
 
     private SettlerEntity getMob() {

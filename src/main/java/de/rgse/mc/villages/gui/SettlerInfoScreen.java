@@ -1,14 +1,12 @@
 package de.rgse.mc.villages.gui;
 
-import de.rgse.mc.villages.entity.settler.SettlerEntity;
-import io.github.cottonmc.cotton.gui.client.CottonClientScreen;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import io.github.cottonmc.cotton.gui.client.CottonInventoryScreen;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
 
-@Environment(EnvType.CLIENT)
-public class SettlerInfoScreen extends CottonClientScreen {
+public class SettlerInfoScreen extends CottonInventoryScreen<SettlerInfoDescription> {
 
-    public SettlerInfoScreen(SettlerEntity settler) {
-        super(settler.getDisplayName(), new SettlerInfoGui(settler));
+    public SettlerInfoScreen(SettlerInfoDescription gui, PlayerEntity player, Text title) {
+        super(gui, player, title);
     }
 }

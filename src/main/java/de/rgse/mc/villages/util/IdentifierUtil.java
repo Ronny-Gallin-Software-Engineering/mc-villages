@@ -5,7 +5,9 @@ import de.rgse.mc.villages.entity.Gender;
 import de.rgse.mc.villages.entity.Profession;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.Identifier;
+import software.bernie.shadowed.fasterxml.jackson.databind.PropertyNamingStrategy;
 
 import java.util.Locale;
 
@@ -37,8 +39,17 @@ public class IdentifierUtil {
     }
 
     public static Identifier skill(Profession profession) {
-        return new Identifier(VillagesMod.MOD_ID, profession.getIdentifier().toString() + "_skill");
+        return Identifier.tryParse(profession.getIdentifier().toString() + "_skill");
     }
+
+    public static Identifier goal(Goal goal) {
+        return goal(goal.getClass());
+    }
+
+    public static Identifier goal(Class<? extends Goal> goal) {
+        return IdentifierUtil.create(new PropertyNamingStrategy.SnakeCaseStrategy().translate(goal.getSimpleName()));
+    }
+
 
     public static class IdentifierBuilder {
 

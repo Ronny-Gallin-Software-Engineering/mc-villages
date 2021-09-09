@@ -4,8 +4,10 @@ import lombok.Getter;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.util.Identifier;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Getter
@@ -19,6 +21,10 @@ public class Skills {
 
     public Set<Skill> getSkills() {
         return skills;
+    }
+
+    public Optional<Skill> getSkill(Identifier identifier) {
+        return skills.stream().filter(s -> s.getIdentifier().equals(identifier)).findFirst();
     }
 
     public NbtCompound toNbt() {

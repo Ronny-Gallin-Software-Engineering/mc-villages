@@ -10,6 +10,10 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BlockUtil {
 
+    public static List<BlockPos> getSurroundingBlocks(BlockPos center) {
+        return getSurroundingBlocks(center, 1);
+    }
+
     public static List<BlockPos> getSurroundingBlocks(BlockPos center, int threshold) {
         List<BlockPos> around = new LinkedList<>();
 

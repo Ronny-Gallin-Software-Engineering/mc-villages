@@ -18,6 +18,7 @@ public class VillagesAnimations {
     public static final AnimationBuilder SETTLER_IDLE_2 = new AnimationBuilder().addAnimation("animation.villages:settler.idle_2", false);
     public static final AnimationBuilder SETTLER_IDLE_3 = new AnimationBuilder().addAnimation("animation.villages:settler.idle_3", false);
     public static final AnimationBuilder SETTLER_IDLE_4 = new AnimationBuilder().addAnimation("animation.villages:settler.idle_4", false);
+    public static final AnimationBuilder CHOP_TREE =  new AnimationBuilder().addAnimation("animation.villages:lumberjack.chop_tree", true);
 
     public static AnimationBuilder randomSettlerIdle() {
         List<AnimationBuilder> animationBuilders = Arrays.asList(SETTLER_IDLE_1, SETTLER_IDLE_2, SETTLER_IDLE_3, SETTLER_IDLE_4);

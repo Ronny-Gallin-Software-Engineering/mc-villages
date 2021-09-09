@@ -1,16 +1,17 @@
 package de.rgse.mc.villages.entity.lumberjack;
 
+import de.rgse.mc.villages.animation.VillagesAnimations;
+import de.rgse.mc.villages.entity.ToolUserEntity;
 import de.rgse.mc.villages.entity.VillagesProfessions;
 import de.rgse.mc.villages.entity.settler.SettlerEntity;
-import de.rgse.mc.villages.goal.CollectSaplingGoal;
-import de.rgse.mc.villages.goal.MoveToTreeGoal;
+import de.rgse.mc.villages.goal.*;
 import de.rgse.mc.villages.sensor.VillagesSensors;
-import de.rgse.mc.villages.task.VillagesModuleMemories;
+import de.rgse.mc.villages.task.VillagesMemories;
+import de.rgse.mc.villages.util.IdentifierUtil;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -23,22 +24,18 @@ import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
+import software.bernie.geckolib3.core.PlayState;
+import software.bernie.geckolib3.core.controller.AnimationController;
+import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.Arrays;
 
-public class LumberjackEntity extends SettlerEntity implements IAnimatable {
+public class LumberjackEntity extends ToolUserEntity implements IAnimatable {
 
     public LumberjackEntity(EntityType<? extends SettlerEntity> entityType, World world) {
         super(entityType, world);
         this.ignoreCameraFrustum = true;
-
         initBrain(world);
-    }
-
-    protected void initBrain(World world) {
-        brain.remember(VillagesModuleMemories.TREE, Optional.empty());
-        brain.remember(VillagesModuleMemories.SAPLING, Optional.empty());
     }
 
     @Override
@@ -48,7 +45,7 @@ public class LumberjackEntity extends SettlerEntity implements IAnimatable {
         setSettlerData(getSettlerData().withProfession(VillagesProfessions.LUMBERJACK));
 
         ItemStack axe = new ItemStack(Items.WOODEN_AXE, 1);
-        equipStack(EquipmentSlot.MAINHAND, axe);
+        mainTool.addStack(axe);
 
         return initialize;
     }
@@ -57,7 +54,16 @@ public class LumberjackEntity extends SettlerEntity implements IAnimatable {
     protected void initGoals() {
         super.initGoals();
         this.goalSelector.add(2, new MoveToTreeGoal(this));
-        this.goalSelector.add(2, new CollectSaplingGoal(this));
+        this.goalSelector.add(2, CollectItemsGoal.ofTags(this, Arrays.asList(ItemTags.SAPLINGS, ItemTags.LOGS)));
+        this.goalSelector.add(3, new PlantSaplingGoal(this));
+        this.goalSelector.add(3, new DeliverItemsToStorageGoal(this, ItemTags.SAPLINGS));
+        this.goalSelector.add(3, new DeliverItemsToStorageGoal(this, ItemTags.LOGS));
+        this.goalSelector.add(4, new BreakTreeGoal(this));
+    }
+
+    @Override
+    public void loot(ItemEntity item) {
+        super.loot(item);
     }
 
     @Override
@@ -66,12 +72,25 @@ public class LumberjackEntity extends SettlerEntity implements IAnimatable {
     }
 
     @Override
-    protected Brain.Profile<?> createBrainProfile() {
-        return Brain.createProfile(List.of(VillagesModuleMemories.TREE, VillagesModuleMemories.SAPLING), List.of(VillagesSensors.TREE_SENSOR, VillagesSensors.SAPLING_SENSOR));
+    public boolean canPickupItem(ItemStack stack) {
+        return super.canPickupItem(stack) || stack.isIn(ItemTags.SAPLINGS) || stack.isIn(ItemTags.LOGS);
     }
 
     @Override
-    public boolean canPickupItem(ItemStack stack) {
-        return super.canPickupItem(stack) || stack.isIn(ItemTags.SAPLINGS) || stack.isIn(ItemTags.LOGS) || stack.isOf(Items.STICK);
+    protected PlayState handleAnimation(AnimationEvent<SettlerEntity> event) {
+        AnimationController<SettlerEntity> controller = event.getController();
+
+        if (getRunningGoals().contains(IdentifierUtil.goal(BreakTreeGoal.class)) && !event.isMoving()) {
+            controller.setAnimation(VillagesAnimations.CHOP_TREE);
+            return PlayState.CONTINUE;
+        } else {
+            return super.handleAnimation(event);
+        }
+
+    }
+
+    static {
+        sensors.addAll(Arrays.asList(VillagesSensors.TREE_SENSOR, VillagesSensors.SAPLING_SENSOR));
+        memories.addAll(Arrays.asList(VillagesMemories.TREE, VillagesMemories.SAPLING));
     }
 }

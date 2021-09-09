@@ -2,7 +2,7 @@ package de.rgse.mc.villages.entity.wanderer;
 
 import de.rgse.mc.villages.goal.MoveToCampfireGoal;
 import de.rgse.mc.villages.task.VillagesActivities;
-import de.rgse.mc.villages.task.VillagesModuleMemories;
+import de.rgse.mc.villages.task.VillagesMemories;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
@@ -27,24 +27,24 @@ public class WandererEntity extends PassiveEntity {
 
     public void setWanderTarget(BlockPos wanderTarget) {
         if (wanderTarget != null) {
-            brain.remember(VillagesModuleMemories.CAMPSITE, wanderTarget);
+            brain.remember(VillagesMemories.CAMPSITE, wanderTarget);
 
         } else {
-            brain.forget(VillagesModuleMemories.CAMPSITE);
+            brain.forget(VillagesMemories.CAMPSITE);
         }
     }
 
     public void setSettled(boolean settled) {
-        brain.remember(VillagesModuleMemories.SETTLED, settled);
+        brain.remember(VillagesMemories.SETTLED, settled);
     }
 
     public BlockPos getWanderTarget() {
-        Optional<BlockPos> optionalMemory = brain.getOptionalMemory(VillagesModuleMemories.CAMPSITE);
+        Optional<BlockPos> optionalMemory = brain.getOptionalMemory(VillagesMemories.CAMPSITE);
         return optionalMemory.orElse(null);
     }
 
     public boolean isSettled() {
-        return brain.getOptionalMemory(VillagesModuleMemories.SETTLED).orElse(false);
+        return brain.getOptionalMemory(VillagesMemories.SETTLED).orElse(false);
     }
 
     private void initBrain(World world) {

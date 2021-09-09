@@ -28,18 +28,21 @@ public class WoodcutterTask extends Task<LumberjackEntity> {
             return false;
         } else {
             this.lastCheckedTime = serverWorld.getTime();
-            GlobalPos globalPos = entity.getBrain().getOptionalMemory(MemoryModuleType.JOB_SITE).get();
-            return globalPos.getDimension() == serverWorld.getRegistryKey() && globalPos.getPos().isWithinDistance(entity.getPos(), 1.73D);
+            Optional<GlobalPos> optionalMemory = entity.getBrain().getOptionalMemory(MemoryModuleType.JOB_SITE);
+            if (optionalMemory.isPresent()) {
+                GlobalPos globalPos = optionalMemory.get();
+                return globalPos.getDimension() == serverWorld.getRegistryKey() && globalPos.getPos().isWithinDistance(entity.getPos(), 1.73D);
+            } else {
+                return false;
+            }
         }
     }
 
     @Override
     protected void run(ServerWorld serverWorld, LumberjackEntity entity, long l) {
-        Brain<LumberjackEntity> brain = (Brain<LumberjackEntity>) entity.getBrain();
+        Brain<?> brain = entity.getBrain();
         brain.remember(MemoryModuleType.LAST_WORKED_AT_POI, l);
-        brain.getOptionalMemory(MemoryModuleType.JOB_SITE).ifPresent((globalPos) -> {
-            brain.remember(MemoryModuleType.LOOK_TARGET, new BlockPosLookTarget(globalPos.getPos()));
-        });
+        brain.getOptionalMemory(MemoryModuleType.JOB_SITE).ifPresent(globalPos -> brain.remember(MemoryModuleType.LOOK_TARGET, new BlockPosLookTarget(globalPos.getPos())));
     }
 
     protected boolean shouldKeepRunning(ServerWorld serverWorld, LumberjackEntity entity, long l) {

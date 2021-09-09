@@ -1,16 +1,12 @@
 package de.rgse.mc.villages.sensor;
 
 import de.rgse.mc.villages.entity.settler.SettlerEntity;
-import de.rgse.mc.villages.task.VillagesModuleMemories;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.sensor.Sensor;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.Tag;
 import net.minecraft.util.math.BlockPos;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
 import java.util.Random;
@@ -18,25 +14,25 @@ import java.util.Set;
 
 public class BlockSensor extends Sensor<SettlerEntity> {
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
     private final Random random = new Random();
-    private final Tag.Identified<Block> block;
-    private final int radiusVertical;
-    private final int radiusHorizontal;
-    private final long sampleCount;
+    private final Block targetBlock;
+    private MemoryModuleType<BlockPos> memory;
 
-    public BlockSensor(Tag.Identified<Block> block, int radiusVertical, int radiusHorizontal) {
-        this.block = block;
-        this.radiusVertical = radiusVertical;
-        this.radiusHorizontal = radiusHorizontal;
-        long blockCount = 8L * (radiusHorizontal * radiusHorizontal * radiusVertical);
-        sampleCount = blockCount / 20;
+    public BlockSensor(Block block, MemoryModuleType<BlockPos> memory) {
+        this.targetBlock = block;
+        this.memory = memory;
     }
 
     @Override
     protected void sense(ServerWorld world, SettlerEntity entity) {
-        Optional<BlockPos> optionalMemory = entity.getBrain().getOptionalMemory(VillagesModuleMemories.TREE);
+        float viewDistance = entity.getSettlerData().getViewDistance();
+        int radiusHorizontal = (int) viewDistance;
+        int radiusVertical = (int) (viewDistance / 2);
+
+
+        long blockCount = 8L * (radiusHorizontal * radiusHorizontal * radiusVertical);
+        long sampleCount = blockCount / 20;
+        Optional<BlockPos> optionalMemory = entity.getBrain().getOptionalMemory(memory);
 
         if (optionalMemory.isPresent()) {
             BlockPos blockPos = optionalMemory.get();
@@ -75,19 +71,19 @@ public class BlockSensor extends Sensor<SettlerEntity> {
             boolean blockFound = match(blockState);
 
             if (blockFound) {
-                entity.getBrain().remember(VillagesModuleMemories.TREE, blockPos);
+                entity.getBrain().remember(memory, blockPos);
                 break;
             }
         }
     }
 
     private boolean match(BlockState blockState) {
-        return block.contains(blockState.getBlock());
+        return blockState.isOf(targetBlock);
     }
 
     @Override
     public Set<MemoryModuleType<?>> getOutputMemoryModules() {
-        return Set.of(VillagesModuleMemories.TREE);
+        return Set.of(memory);
     }
 
 }

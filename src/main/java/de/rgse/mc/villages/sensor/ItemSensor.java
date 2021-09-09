@@ -1,7 +1,6 @@
 package de.rgse.mc.villages.sensor;
 
 import de.rgse.mc.villages.entity.settler.SettlerEntity;
-import de.rgse.mc.villages.task.VillagesModuleMemories;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.sensor.Sensor;
@@ -9,8 +8,6 @@ import net.minecraft.item.Item;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.math.BlockPos;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Optional;

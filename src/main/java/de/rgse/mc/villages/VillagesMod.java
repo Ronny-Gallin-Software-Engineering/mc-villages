@@ -11,6 +11,7 @@ import de.rgse.mc.villages.gui.VillagesGuis;
 import de.rgse.mc.villages.item.VillagesItems;
 import de.rgse.mc.villages.resource.VillagesResources;
 import de.rgse.mc.villages.sensor.VillagesSensors;
+import de.rgse.mc.villages.sound.VillagesSounds;
 import de.rgse.mc.villages.task.VillagesActivities;
 import de.rgse.mc.villages.task.VillagesSchedules;
 import de.rgse.mc.villages.world.VillagesPOITypes;
@@ -46,6 +47,7 @@ public class VillagesMod implements ModInitializer {
         VillagesActivities.register();
         VillagesSchedules.register();
         VillagesSensors.register();
+        VillagesSounds.register();
 
         VillagesBlockEntities.register();
 

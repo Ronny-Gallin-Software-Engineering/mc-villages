@@ -3,30 +3,40 @@ package de.rgse.mc.villages.entity.settler;
 import de.rgse.mc.villages.VillagesMod;
 import de.rgse.mc.villages.animation.VillagesAnimations;
 import de.rgse.mc.villages.entity.*;
-import de.rgse.mc.villages.gui.SettlerInfoScreen;
+import de.rgse.mc.villages.goal.BreakTreeGoal;
+import de.rgse.mc.villages.gui.SettlerInfoDescription;
+import de.rgse.mc.villages.task.VillagesMemories;
 import de.rgse.mc.villages.text.NameText;
 import de.rgse.mc.villages.util.IdentifierUtil;
 import de.rgse.mc.villages.util.NameUtil;
 import de.rgse.mc.villages.util.VillagesParticleUtil;
+import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.brain.Brain;
+import net.minecraft.entity.ai.brain.MemoryModuleType;
+import net.minecraft.entity.ai.brain.sensor.Sensor;
+import net.minecraft.entity.ai.brain.sensor.SensorType;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.entity.ai.goal.FleeEntityGoal;
-import net.minecraft.entity.ai.goal.PrioritizedGoal;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.mob.*;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.PropertyDelegate;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -45,17 +55,28 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
+
+import static de.rgse.mc.villages.sensor.VillagesSensors.CHEST_SENSOR;
 
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class SettlerEntity extends PassiveEntity implements IAnimatable, InventoryOwner {
+public class SettlerEntity extends PassiveEntity implements IAnimatable, InventoryOwner, NamedScreenHandlerFactory, PropertyDelegateHolder {
+
+    protected static List<SensorType<? extends Sensor<? super SettlerEntity>>> sensors = new LinkedList<>(List.of(CHEST_SENSOR));
+    protected static List<MemoryModuleType<?>> memories = new LinkedList<>(List.of(VillagesMemories.CHEST));
 
     private static final TrackedData<SettlerData> SETTLER_DATA = DataTracker.registerData(SettlerEntity.class, SettlerData.SETTLER_DATA);
     private final AnimationFactory animationFactory = new AnimationFactory(this);
     private SimpleInventory inventory = new SimpleInventory(5);
+
+    private Set<Identifier> runningGoals = new HashSet<>();
+
+    private int syncId;
 
     public SettlerEntity(EntityType<? extends SettlerEntity> entityType, World world) {
         super(entityType, world);
@@ -85,7 +106,7 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable, Invento
     @Nullable
     @Override
     public SettlerEntity createChild(ServerWorld world, PassiveEntity parent) {
-        if (parent.getClass().isAssignableFrom(SettlerEntity.class)) {
+        if (!isBaby() && parent.getClass().isAssignableFrom(SettlerEntity.class)) {
             return new SettlerEntity(VillagesEntities.SETTLER, world);
         } else {
             return null;
@@ -105,6 +126,11 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable, Invento
     }
 
     @Override
+    protected Brain.Profile<?> createBrainProfile() {
+        return Brain.createProfile(memories, sensors);
+    }
+
+    @Override
     protected void initGoals() {
         this.goalSelector.add(1, new FleeEntityGoal<>(this, ZombieEntity.class, 8.0F, 0.5D, 0.5D));
         this.goalSelector.add(1, new FleeEntityGoal<>(this, EvokerEntity.class, 12.0F, 0.5D, 0.5D));
@@ -119,15 +145,20 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable, Invento
     protected PlayState handleAnimation(AnimationEvent<SettlerEntity> event) {
         AnimationController<SettlerEntity> controller = event.getController();
 
-        if (event.isMoving()) {
-            controller.setAnimation(event.getAnimatable().getSettlerData().getMood().isSad() ? VillagesAnimations.SETTLER_WALK_SAD : VillagesAnimations.SETTLER_WALK);
-        } else if (controller.getCurrentAnimation() == null && world.getRandom().nextInt(20) == 0) {
-            controller.setAnimation(VillagesAnimations.randomSettlerIdle());
-
+        if (getRunningGoals().contains(IdentifierUtil.goal(BreakTreeGoal.class))) {
+            controller.setAnimation(VillagesAnimations.CHOP_TREE);
         } else {
-            controller.setAnimation(VillagesAnimations.SETTLER_IDLE_0);
-        }
 
+            if (event.isMoving()) {
+                controller.setAnimation(event.getAnimatable().getSettlerData().getMood().isSad() ? VillagesAnimations.SETTLER_WALK_SAD : VillagesAnimations.SETTLER_WALK);
+
+            } else if (controller.getCurrentAnimation() == null && world.getRandom().nextInt(20) == 0) {
+                controller.setAnimation(VillagesAnimations.randomSettlerIdle());
+
+            } else {
+                controller.setAnimation(VillagesAnimations.SETTLER_IDLE_0);
+            }
+        }
         return PlayState.CONTINUE;
     }
 
@@ -176,8 +207,7 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable, Invento
             villageNbt.putString(IdentifierUtil.createString("profession"), settlerData.getProfession().getIdentifier().toString());
         }
 
-        nbt.put("iventory", inventory.toNbtList());
-
+        villageNbt.put(IdentifierUtil.createString("inventory"), inventory.toNbtList());
         nbt.put(VillagesMod.MOD_ID, villageNbt);
     }
 
@@ -203,10 +233,10 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable, Invento
                 Identifier identifier = Identifier.tryParse(villagesNbt.getString(IdentifierUtil.createString("profession")));
                 settlerData.setProfession(VillagesProfessions.of(identifier));
             }
+
+            NbtList inventory = villagesNbt.getList(IdentifierUtil.createString("inventory"), NbtElement.COMPOUND_TYPE);
+            this.inventory.readNbtList(inventory);
         }
-
-        this.inventory.readNbtList(nbt.getList("Inventory", NbtElement.LIST_TYPE));
-
 
         setCustomName(NameText.of(this));
         setCustomNameVisible(true);
@@ -219,9 +249,7 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable, Invento
             if (this.isBaby()) {
                 return ActionResult.success(this.world.isClient);
             } else {
-                if (world.isClient) {
-                    MinecraftClient.getInstance().setScreen(new SettlerInfoScreen(this));
-                }
+                player.openHandledScreen(this);
                 return ActionResult.success(this.world.isClient);
             }
         } else {
@@ -231,7 +259,7 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable, Invento
 
     @Override
     protected void mobTick() {
-        ((Brain<SettlerEntity>) this.getBrain()).tick((ServerWorld) this.world, this);
+        this.getBrain().tick((ServerWorld) this.world, this);
     }
 
     @Override
@@ -257,7 +285,13 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable, Invento
     }
 
     @Override
-    protected void loot(ItemEntity item) {
+    public void sendPickup(Entity item, int count) {
+        super.sendPickup(item, count);
+    }
+
+    @Override
+    public void loot(ItemEntity item) {
+        super.loot(item);
         ItemStack itemStack = item.getStack();
         if (this.canGather(itemStack)) {
             SimpleInventory simpleInventory = this.getInventory();
@@ -277,11 +311,23 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable, Invento
         }
     }
 
+    @Override
+    public Brain<SettlerEntity> getBrain() {
+        return (Brain<SettlerEntity>) super.getBrain();
+    }
+
     public SimpleInventory getInventory() {
         return inventory;
     }
 
-    public List<PrioritizedGoal> getRunningGoals() {
-        return goalSelector.getRunningGoals().collect(Collectors.toUnmodifiableList());
+    @Nullable
+    @Override
+    public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
+        return new SettlerInfoDescription(syncId, inv, ScreenHandlerContext.create(world, getBlockPos()));
+    }
+
+    @Override
+    public PropertyDelegate getPropertyDelegate() {
+        return null;
     }
 }

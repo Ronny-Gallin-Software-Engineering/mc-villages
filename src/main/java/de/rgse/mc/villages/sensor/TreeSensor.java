@@ -3,7 +3,7 @@ package de.rgse.mc.villages.sensor;
 import de.rgse.mc.villages.block.PillarBlockEntity;
 import de.rgse.mc.villages.entity.settler.SettlerEntity;
 import de.rgse.mc.villages.pattern.TreePattern;
-import de.rgse.mc.villages.task.VillagesModuleMemories;
+import de.rgse.mc.villages.task.VillagesMemories;
 import lombok.NoArgsConstructor;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -24,7 +24,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class TreeSensor extends Sensor<SettlerEntity> {
 
-    private static final Logger LOGGER = LogManager.getLogger();
     private static final Tag.Identified<Block> BLOCK = BlockTags.LOGS;
 
     private final Random random = new Random();
@@ -36,7 +35,7 @@ public class TreeSensor extends Sensor<SettlerEntity> {
         long blockCount = 8L * (radiusHorizontal * radiusHorizontal * radiusVertical);
         long sampleCount = blockCount / 20;
 
-        Optional<BlockPos> treeMemory = entity.getBrain().getOptionalMemory(VillagesModuleMemories.TREE);
+        Optional<BlockPos> treeMemory = entity.getBrain().getOptionalMemory(VillagesMemories.TREE);
 
         if (treeMemory.isPresent()) {
             BlockPos rememberedPosition = treeMemory.get();
@@ -52,11 +51,10 @@ public class TreeSensor extends Sensor<SettlerEntity> {
             BlockState blockState = world.getBlockState(sample);
 
             if (isRequiredBlockType(blockState)) {
-                TreePattern treePattern = new TreePattern(world);
                 PillarBlockEntity blockEntity = (PillarBlockEntity) world.getBlockEntity(sample);
 
-                if (blockEntity != null && blockEntity.isNaturallyGenerated() && treePattern.matches(sample)) {
-                    entity.getBrain().remember(VillagesModuleMemories.TREE, TreePattern.normaliseSample(sample, world));
+                if (blockEntity != null && blockEntity.isNaturallyGenerated()) {
+                    entity.getBrain().remember(VillagesMemories.TREE, TreePattern.normaliseSample(sample, world));
                     break;
                 }
             }
@@ -97,7 +95,7 @@ public class TreeSensor extends Sensor<SettlerEntity> {
 
     @Override
     public Set<MemoryModuleType<?>> getOutputMemoryModules() {
-        return Set.of(VillagesModuleMemories.TREE);
+        return Set.of(VillagesMemories.TREE);
     }
 
 }
