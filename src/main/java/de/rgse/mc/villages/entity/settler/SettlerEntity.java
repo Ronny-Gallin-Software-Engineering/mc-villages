@@ -33,10 +33,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.screen.*;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -55,10 +52,8 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import static de.rgse.mc.villages.sensor.VillagesSensors.CHEST_SENSOR;
 
@@ -74,7 +69,7 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable, Invento
     private final AnimationFactory animationFactory = new AnimationFactory(this);
     private SimpleInventory inventory = new SimpleInventory(5);
 
-    private Set<Identifier> runningGoals = new HashSet<>();
+    private List<Identifier> runningGoals = new LinkedList<>();
 
     private int syncId;
 
@@ -146,7 +141,7 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable, Invento
         AnimationController<SettlerEntity> controller = event.getController();
 
         if (getRunningGoals().contains(IdentifierUtil.goal(BreakTreeGoal.class))) {
-            controller.setAnimation(VillagesAnimations.CHOP_TREE);
+            controller.setAnimation(VillagesAnimations.LUMBERJACK_CHOP_TREE);
         } else {
 
             if (event.isMoving()) {
@@ -328,6 +323,8 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable, Invento
 
     @Override
     public PropertyDelegate getPropertyDelegate() {
-        return null;
+        ArrayPropertyDelegate arrayPropertyDelegate = new ArrayPropertyDelegate(1);
+        arrayPropertyDelegate.set(0, getId());
+        return arrayPropertyDelegate;
     }
 }

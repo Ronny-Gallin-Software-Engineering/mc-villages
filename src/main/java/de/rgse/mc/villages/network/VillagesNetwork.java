@@ -10,12 +10,9 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.entity.EntityLookup;
 
 import java.util.Collection;
 
@@ -50,5 +47,8 @@ public class VillagesNetwork {
     public static void registerClient() {
         ClientPlayNetworking.registerGlobalReceiver(START_TASK_INFO, new StartTaskInfoPacketHandler());
         ClientPlayNetworking.registerGlobalReceiver(STOP_TASK_INFO, new StopTaskInfoPacketHandler());
+    }
+
+    public static void register() {
     }
 }

@@ -10,10 +10,16 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particle.BlockStateParticleEffect;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.Feature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -88,6 +94,15 @@ public class PlantSaplingGoal extends Goal {
         super.tick();
         Optional<Skill> skill = settler.getSettlerData().getSkills().getSkill(VillagesSkills.LUMBERJACK);
         float level = skill.map(Skill::getLevel).orElse(1f);
+
+
+        World world = settler.world;
+        if (!world.isClient && counter % 20 == 0) {
+            BlockPos targetPos = settler.getBlockPos().down();
+            BlockState blockState = world.getBlockState(targetPos);
+            ((ServerWorld) world).spawnParticles(new BlockStateParticleEffect(ParticleTypes.BLOCK, blockState), targetPos.getX() + 0.5D, targetPos.getY() + 0.7D, targetPos.getZ() + 0.5D, 3, (world.getRandom().nextFloat() - 0.5D) * 0.08D, (world.getRandom().nextFloat() - 0.5D) * 0.08D, (world.getRandom().nextFloat() - 0.5D) * 0.08D, 0.15000000596046448D);
+            world.playSound(null, targetPos, SoundEvents.BLOCK_GRASS_STEP, SoundCategory.BLOCKS, .8f, .5f);
+        }
 
         if (++counter / level >= SKILL_THRESHOLD) {
             ItemStack stack = settler.getInventory().getStack(indexToPlace);

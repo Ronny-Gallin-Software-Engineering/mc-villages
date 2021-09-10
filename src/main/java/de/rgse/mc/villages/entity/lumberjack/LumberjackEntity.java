@@ -81,12 +81,14 @@ public class LumberjackEntity extends ToolUserEntity implements IAnimatable {
         AnimationController<SettlerEntity> controller = event.getController();
 
         if (getRunningGoals().contains(IdentifierUtil.goal(BreakTreeGoal.class)) && !event.isMoving()) {
-            controller.setAnimation(VillagesAnimations.CHOP_TREE);
+            controller.setAnimation(VillagesAnimations.LUMBERJACK_CHOP_TREE);
+            return PlayState.CONTINUE;
+        } else if (getRunningGoals().contains(IdentifierUtil.goal(PlantSaplingGoal.class)) && !event.isMoving()) {
+            controller.setAnimation(VillagesAnimations.LUMBERJACK_PLANT_SAPLING);
             return PlayState.CONTINUE;
         } else {
             return super.handleAnimation(event);
         }
-
     }
 
     static {
