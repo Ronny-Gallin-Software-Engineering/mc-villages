@@ -1,0 +1,8 @@
+{
+  "entities": [
+    "villages:lumberjack"
+  ],
+  "slots": [
+    "hand/tool"
+  ]
+}

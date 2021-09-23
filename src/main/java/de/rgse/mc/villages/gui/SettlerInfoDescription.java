@@ -72,8 +72,8 @@ public class SettlerInfoDescription extends SyncedGuiDescription {
             if (settler != null) {
                 SimpleInventory simpleInventory = new SimpleInventory(INVENTORY_SIZE);
 
-                if (settler instanceof ToolUserEntity) {
-                    simpleInventory.setStack(0, ((ToolUserEntity) settler).getMainTool().getStack(0));
+                if (settler instanceof ToolUserEntity toolUser) {
+                    simpleInventory.setStack(0, toolUser.getMainTool());
                 }
 
                 for (int i = 0; i < settler.getInventory().size(); i++) {

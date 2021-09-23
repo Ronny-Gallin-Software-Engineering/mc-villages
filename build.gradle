@@ -20,7 +20,14 @@ repositories {
      maven { url "https://repo.spongepowered.org/maven/"}
      maven { url "https://maven.terraformersmc.com/"}
      maven { url "https://maven.shedaniel.me/"}
-
+     maven {
+	    name = "TerraformersMC"
+		url = "https://maven.terraformersmc.com/"
+	 }
+	 maven {
+		name = "Ladysnake Libs"
+		url = "https://ladysnake.jfrog.io/artifactory/mods"
+	 }
 }
 
 idea {
@@ -51,6 +58,8 @@ dependencies {
 
     testImplementation(platform('org.junit:junit-bom:5.7.2'))
     testImplementation('org.junit.jupiter:junit-jupiter')
+
+    modImplementation "dev.emi:trinkets:3.0.4"
 }
 
 processResources {

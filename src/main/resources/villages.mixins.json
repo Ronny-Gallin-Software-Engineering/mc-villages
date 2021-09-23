@@ -6,7 +6,9 @@
   "mixins": [
     "ActivityAccessor",
     "BlocksMixin",
+    "CompositeTaskAccessor",
     "GenericBlockStateMixin",
+    "LecternBlockMixin",
     "MemoryModuleTypeAccessor",
     "PointOfInterestTypeAccessor",
     "RegistryAccessor",

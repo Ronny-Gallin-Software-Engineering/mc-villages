@@ -13,9 +13,8 @@ import net.minecraft.entity.ai.brain.sensor.Sensor;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.Tag;
+import net.minecraft.util.dynamic.GlobalPos;
 import net.minecraft.util.math.BlockPos;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
 import java.util.Random;
@@ -35,13 +34,17 @@ public class TreeSensor extends Sensor<SettlerEntity> {
         long blockCount = 8L * (radiusHorizontal * radiusHorizontal * radiusVertical);
         long sampleCount = blockCount / 20;
 
-        Optional<BlockPos> treeMemory = entity.getBrain().getOptionalMemory(VillagesMemories.TREE);
+        Optional<GlobalPos> treeMemory = entity.getBrain().getOptionalMemory(VillagesMemories.TREE);
 
         if (treeMemory.isPresent()) {
-            BlockPos rememberedPosition = treeMemory.get();
-            BlockState rememberedBlock = world.getBlockState(rememberedPosition);
-            if (isRequiredBlockType(rememberedBlock)) {
-                return;
+            GlobalPos rememberedPosition = treeMemory.get();
+            if (world.getRegistryKey() != rememberedPosition.getDimension()) {
+                entity.getBrain().forget(VillagesMemories.TREE);
+            } else {
+                BlockState rememberedBlock = world.getBlockState(rememberedPosition.getPos());
+                if (isRequiredBlockType(rememberedBlock)) {
+                    return;
+                }
             }
         }
 
@@ -54,7 +57,8 @@ public class TreeSensor extends Sensor<SettlerEntity> {
                 PillarBlockEntity blockEntity = (PillarBlockEntity) world.getBlockEntity(sample);
 
                 if (blockEntity != null && blockEntity.isNaturallyGenerated()) {
-                    entity.getBrain().remember(VillagesMemories.TREE, TreePattern.normaliseSample(sample, world));
+                    BlockPos stump = TreePattern.normaliseSample(sample, world);
+                    entity.getBrain().remember(VillagesMemories.TREE, GlobalPos.create(world.getRegistryKey(), stump));
                     break;
                 }
             }

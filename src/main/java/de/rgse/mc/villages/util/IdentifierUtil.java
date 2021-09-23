@@ -5,6 +5,7 @@ import de.rgse.mc.villages.entity.Gender;
 import de.rgse.mc.villages.entity.Profession;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.minecraft.entity.ai.brain.task.Task;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.Identifier;
 import software.bernie.shadowed.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -30,6 +31,10 @@ public class IdentifierUtil {
         return new Identifier(VillagesMod.MOD_ID, "profession_" + value);
     }
 
+    public static Identifier thought(String value) {
+        return new Identifier(VillagesMod.MOD_ID, "thought_" + value);
+    }
+
     public static Identifier create(String value) {
         return new Identifier(VillagesMod.MOD_ID, value);
     }
@@ -43,13 +48,20 @@ public class IdentifierUtil {
     }
 
     public static Identifier goal(Goal goal) {
-        return goal(goal.getClass());
+        return ofClass(goal.getClass());
     }
 
-    public static Identifier goal(Class<? extends Goal> goal) {
-        return IdentifierUtil.create(new PropertyNamingStrategy.SnakeCaseStrategy().translate(goal.getSimpleName()));
+    public static IdentifierBuilder particle() {
+        return new IdentifierBuilder("particle");
     }
 
+    public static Identifier task(Task task) {
+        return ofClass(task.getClass());
+    }
+
+    public static Identifier ofClass(Class<?> clazz) {
+        return IdentifierUtil.create(new PropertyNamingStrategy.SnakeCaseStrategy().translate(clazz.getSimpleName()));
+    }
 
     public static class IdentifierBuilder {
 

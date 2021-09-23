@@ -9,6 +9,7 @@ import me.lortseam.completeconfig.api.ConfigGroup;
 public class GameplayConfig implements ConfigGroup {
 
     public static boolean settlerDoAge = false;
+    public static int deliverItemThreshold = 16;
 
     @Override
     public String getId() {

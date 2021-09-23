@@ -1,20 +1,20 @@
 package de.rgse.mc.villages.entity.settler;
 
-import de.rgse.mc.villages.VillagesMod;
 import de.rgse.mc.villages.animation.VillagesAnimations;
 import de.rgse.mc.villages.entity.*;
-import de.rgse.mc.villages.goal.BreakTreeGoal;
+import de.rgse.mc.villages.entity.thought.Thoughts;
 import de.rgse.mc.villages.gui.SettlerInfoDescription;
 import de.rgse.mc.villages.task.VillagesMemories;
 import de.rgse.mc.villages.text.NameText;
-import de.rgse.mc.villages.util.IdentifierUtil;
 import de.rgse.mc.villages.util.NameUtil;
+import de.rgse.mc.villages.util.NbtUtil;
 import de.rgse.mc.villages.util.VillagesParticleUtil;
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.entity.*;
+import net.minecraft.entity.ai.brain.Activity;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.sensor.Sensor;
@@ -31,8 +31,6 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.screen.*;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
@@ -52,8 +50,7 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static de.rgse.mc.villages.sensor.VillagesSensors.CHEST_SENSOR;
 
@@ -63,26 +60,35 @@ import static de.rgse.mc.villages.sensor.VillagesSensors.CHEST_SENSOR;
 public class SettlerEntity extends PassiveEntity implements IAnimatable, InventoryOwner, NamedScreenHandlerFactory, PropertyDelegateHolder {
 
     protected static List<SensorType<? extends Sensor<? super SettlerEntity>>> sensors = new LinkedList<>(List.of(CHEST_SENSOR));
-    protected static List<MemoryModuleType<?>> memories = new LinkedList<>(List.of(VillagesMemories.CHEST));
-
+    protected static List<MemoryModuleType<?>> memories = new LinkedList<>(List.of(VillagesMemories.CHEST, VillagesMemories.EATEN, MemoryModuleType.WALK_TARGET, VillagesMemories.VILLAGE));
+    protected static Set<Activity> coreActivities = new HashSet<>(Set.of(Activity.CORE));
     private static final TrackedData<SettlerData> SETTLER_DATA = DataTracker.registerData(SettlerEntity.class, SettlerData.SETTLER_DATA);
+
     private final AnimationFactory animationFactory = new AnimationFactory(this);
     private SimpleInventory inventory = new SimpleInventory(5);
-
     private List<Identifier> runningGoals = new LinkedList<>();
-
+    private Thoughts thoughts;
     private int syncId;
 
     public SettlerEntity(EntityType<? extends SettlerEntity> entityType, World world) {
         super(entityType, world);
         this.ignoreCameraFrustum = true;
         this.setSettlerData(this.getSettlerData());
+        this.thoughts = new Thoughts(this);
         setCustomNameVisible(true);
         setMovementSpeed(.4f);
         setCanPickUpLoot(true);
+        initBrain(world);
     }
 
     protected void initBrain(World world) {
+        Brain<SettlerEntity> b = (Brain<SettlerEntity>) brain;
+
+        b.setTaskList(Activity.IDLE, SettlerTaskListFactory.createIdleTasks());
+
+        b.setCoreActivities(SettlerEntity.coreActivities);
+        b.setSchedule(SettlerTaskListFactory.SCHEDULE);
+        b.refreshActivities(world.getTimeOfDay(), world.getTime());
     }
 
     public SettlerData getSettlerData() {
@@ -140,23 +146,20 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable, Invento
     protected PlayState handleAnimation(AnimationEvent<SettlerEntity> event) {
         AnimationController<SettlerEntity> controller = event.getController();
 
-        if (getRunningGoals().contains(IdentifierUtil.goal(BreakTreeGoal.class))) {
-            controller.setAnimation(VillagesAnimations.LUMBERJACK_CHOP_TREE);
+        if (event.isMoving()) {
+            controller.setAnimation(event.getAnimatable().getSettlerData().getMood().isSad() ? VillagesAnimations.SETTLER_WALK_SAD : VillagesAnimations.SETTLER_WALK);
+
+        } else if (controller.getCurrentAnimation() == null && world.getRandom().nextInt(20) == 0) {
+            controller.setAnimation(VillagesAnimations.randomSettlerIdle());
+
         } else {
-
-            if (event.isMoving()) {
-                controller.setAnimation(event.getAnimatable().getSettlerData().getMood().isSad() ? VillagesAnimations.SETTLER_WALK_SAD : VillagesAnimations.SETTLER_WALK);
-
-            } else if (controller.getCurrentAnimation() == null && world.getRandom().nextInt(20) == 0) {
-                controller.setAnimation(VillagesAnimations.randomSettlerIdle());
-
-            } else {
-                controller.setAnimation(VillagesAnimations.SETTLER_IDLE_0);
-            }
+            controller.setAnimation(VillagesAnimations.SETTLER_IDLE_0);
         }
+
         return PlayState.CONTINUE;
     }
 
+    @Override
     protected void initDataTracker() {
         super.initDataTracker();
         this.dataTracker.startTracking(SETTLER_DATA, new SettlerData());
@@ -185,56 +188,15 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable, Invento
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-
-        NbtCompound villageNbt = new NbtCompound();
-
-        SettlerData settlerData = getSettlerData();
-
-        if (settlerData.getGender() != null) {
-            villageNbt.putString(IdentifierUtil.createString("gender"), settlerData.getGender().name());
-        }
-
-        if (settlerData.getVillagerName() != null) {
-            villageNbt.putString(IdentifierUtil.createString("name"), settlerData.getVillagerName().toString());
-        }
-
-        if (settlerData.getProfession() != null) {
-            villageNbt.putString(IdentifierUtil.createString("profession"), settlerData.getProfession().getIdentifier().toString());
-        }
-
-        villageNbt.put(IdentifierUtil.createString("inventory"), inventory.toNbtList());
-        nbt.put(VillagesMod.MOD_ID, villageNbt);
+        NbtUtil.writeSettlerDataToNbt(this, nbt);
     }
 
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-
-        if (nbt.contains(VillagesMod.MOD_ID)) {
-            SettlerData settlerData = getSettlerData();
-
-            NbtCompound villagesNbt = nbt.getCompound(VillagesMod.MOD_ID);
-
-            if (villagesNbt.contains(IdentifierUtil.createString("gender"))) {
-                settlerData.setGender(Gender.valueOf(villagesNbt.getString(IdentifierUtil.createString("gender"))));
-            }
-
-            if (villagesNbt.contains(IdentifierUtil.createString("name"))) {
-                settlerData.setVillagerName(EntityName.parse(villagesNbt.getString(IdentifierUtil.createString("name"))));
-            }
-
-            if (villagesNbt.contains(IdentifierUtil.createString("profession"))) {
-                Identifier identifier = Identifier.tryParse(villagesNbt.getString(IdentifierUtil.createString("profession")));
-                settlerData.setProfession(VillagesProfessions.of(identifier));
-            }
-
-            NbtList inventory = villagesNbt.getList(IdentifierUtil.createString("inventory"), NbtElement.COMPOUND_TYPE);
-            this.inventory.readNbtList(inventory);
-        }
-
-        setCustomName(NameText.of(this));
-        setCustomNameVisible(true);
+        NbtUtil.readSettlerDataFromNbt(this, nbt);
+        initBrain(world);
     }
 
     @Override
@@ -255,11 +217,12 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable, Invento
     @Override
     protected void mobTick() {
         this.getBrain().tick((ServerWorld) this.world, this);
+        this.thoughts.tick();
     }
 
     @Override
     public Text getDisplayName() {
-        MutableText text = getCustomName().shallowCopy();
+        MutableText text = Objects.requireNonNull(getCustomName()).shallowCopy();
 
         Profession profession = getSettlerData().getProfession();
         if (profession != VillagesProfessions.NONE) {
@@ -277,11 +240,6 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable, Invento
     @Override
     public boolean canPickUpLoot() {
         return !isBaby();
-    }
-
-    @Override
-    public void sendPickup(Entity item, int count) {
-        super.sendPickup(item, count);
     }
 
     @Override

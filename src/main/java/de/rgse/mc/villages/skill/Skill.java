@@ -22,7 +22,7 @@ public class Skill {
     public Skill(Profession profession) {
         this.identifier = IdentifierUtil.skill(profession);
         this.profession = profession;
-        this.level = 0f;
+        this.level = 1f;
     }
 
     public NbtCompound toNbt() {

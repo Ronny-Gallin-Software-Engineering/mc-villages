@@ -5,6 +5,7 @@ import de.rgse.mc.villages.entity.VillagesEntities;
 import de.rgse.mc.villages.entity.settler.SettlerData;
 import de.rgse.mc.villages.gui.VillagesGuis;
 import de.rgse.mc.villages.network.VillagesNetwork;
+import de.rgse.mc.villages.particle.VillagesParticles;
 import de.rgse.mc.villages.world.VillagesPOITypes;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
@@ -22,6 +23,7 @@ public class VillagesModClient implements ClientModInitializer {
 
         VillagesNetwork.registerClient();
         VillagesGuis.registerClient();
+        VillagesParticles.registerClient();
 
         VillagesMod.LOGGER.info("{} client initialised", VillagesMod.MOD_ID);
     }

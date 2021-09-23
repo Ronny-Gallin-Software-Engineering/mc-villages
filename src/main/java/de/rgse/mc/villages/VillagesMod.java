@@ -10,6 +10,8 @@ import de.rgse.mc.villages.entity.settler.SettlerData;
 import de.rgse.mc.villages.gui.VillagesGuis;
 import de.rgse.mc.villages.item.VillagesItems;
 import de.rgse.mc.villages.network.VillagesNetwork;
+import de.rgse.mc.villages.particle.VillagesParticles;
+import de.rgse.mc.villages.poi.VillagesPOI;
 import de.rgse.mc.villages.resource.VillagesResources;
 import de.rgse.mc.villages.sensor.VillagesSensors;
 import de.rgse.mc.villages.sound.VillagesSounds;
@@ -50,6 +52,8 @@ public class VillagesMod implements ModInitializer {
         VillagesSensors.register();
         VillagesSounds.register();
         VillagesNetwork.register();
+        VillagesParticles.register();
+        VillagesPOI.register();
 
         VillagesBlockEntities.register();
 

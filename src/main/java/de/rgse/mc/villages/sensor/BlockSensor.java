@@ -6,6 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.sensor.Sensor;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.dynamic.GlobalPos;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Optional;
@@ -16,9 +17,9 @@ public class BlockSensor extends Sensor<SettlerEntity> {
 
     private final Random random = new Random();
     private final Block targetBlock;
-    private MemoryModuleType<BlockPos> memory;
+    private MemoryModuleType<GlobalPos> memory;
 
-    public BlockSensor(Block block, MemoryModuleType<BlockPos> memory) {
+    public BlockSensor(Block block, MemoryModuleType<GlobalPos> memory) {
         this.targetBlock = block;
         this.memory = memory;
     }
@@ -32,11 +33,11 @@ public class BlockSensor extends Sensor<SettlerEntity> {
 
         long blockCount = 8L * (radiusHorizontal * radiusHorizontal * radiusVertical);
         long sampleCount = blockCount / 20;
-        Optional<BlockPos> optionalMemory = entity.getBrain().getOptionalMemory(memory);
+        Optional<GlobalPos> optionalMemory = entity.getBrain().getOptionalMemory(memory);
 
-        if (optionalMemory.isPresent()) {
-            BlockPos blockPos = optionalMemory.get();
-            BlockState rememberedBlock = world.getBlockState(blockPos);
+        if (optionalMemory.isPresent() && world.getRegistryKey() == optionalMemory.get().getDimension()) {
+            GlobalPos blockPos = optionalMemory.get();
+            BlockState rememberedBlock = world.getBlockState(blockPos.getPos());
             if (match(rememberedBlock)) {
                 return;
             }
@@ -71,7 +72,7 @@ public class BlockSensor extends Sensor<SettlerEntity> {
             boolean blockFound = match(blockState);
 
             if (blockFound) {
-                entity.getBrain().remember(memory, blockPos);
+                entity.getBrain().remember(memory, GlobalPos.create(world.getRegistryKey(), blockPos));
                 break;
             }
         }

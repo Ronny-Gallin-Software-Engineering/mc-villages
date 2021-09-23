@@ -10,8 +10,8 @@ import net.minecraft.entity.ai.brain.Schedule;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class VillagesSchedules {
 
-    public static final Schedule LUMBERJACK = ScheduleAccessor.register(IdentifierUtil.createString("lumberjack_schedule"))
-            .withActivity(ClockUtil.seven(ClockUtil.MeridiemIndicator.AM), VillagesActivities.FIND_WOOD).build();
+    public static final Schedule DEFAULT_SCHEDULE = ScheduleAccessor.register(IdentifierUtil.createString("settler_default_schedule"))
+            .withActivity(ClockUtil.seven(ClockUtil.MeridiemIndicator.AM), VillagesActivities.BREAKFAST).build();
 
     public static void register(){}
 }

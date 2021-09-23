@@ -4,15 +4,26 @@ import de.rgse.mc.villages.animation.VillagesAnimations;
 import de.rgse.mc.villages.entity.ToolUserEntity;
 import de.rgse.mc.villages.entity.VillagesProfessions;
 import de.rgse.mc.villages.entity.settler.SettlerEntity;
-import de.rgse.mc.villages.goal.*;
-import de.rgse.mc.villages.sensor.VillagesSensors;
+import de.rgse.mc.villages.entity.settler.SettlerTaskListFactory;
+import de.rgse.mc.villages.mixin.ScheduleAccessor;
+import de.rgse.mc.villages.skill.Skill;
 import de.rgse.mc.villages.task.VillagesMemories;
+import de.rgse.mc.villages.task.lumberjack.ChopTreeTask;
+import de.rgse.mc.villages.task.lumberjack.PlantSaplingTask;
 import de.rgse.mc.villages.util.IdentifierUtil;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.brain.Activity;
+import net.minecraft.entity.ai.brain.Brain;
+import net.minecraft.entity.ai.brain.MemoryModuleType;
+import net.minecraft.entity.ai.brain.Schedule;
+import net.minecraft.entity.ai.brain.sensor.Sensor;
+import net.minecraft.entity.ai.brain.sensor.SensorType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.AxeItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -28,9 +39,15 @@ import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 
-import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import static de.rgse.mc.villages.sensor.VillagesSensors.*;
 
 public class LumberjackEntity extends ToolUserEntity implements IAnimatable {
+
+    private static final List<SensorType<? extends Sensor<? super SettlerEntity>>> sensors = new LinkedList<>(List.of(TREE_SENSOR, SAPLING_SENSOR, CRAFTING_TABLE_SENSOR));
+    private static final List<MemoryModuleType<?>> memories = new LinkedList<>(List.of(VillagesMemories.TREE, VillagesMemories.POI));
 
     public LumberjackEntity(EntityType<? extends SettlerEntity> entityType, World world) {
         super(entityType, world);
@@ -39,26 +56,24 @@ public class LumberjackEntity extends ToolUserEntity implements IAnimatable {
     }
 
     @Override
-    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
-        EntityData initialize = super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
-        setSettlerData(getSettlerData().withProfession(VillagesProfessions.LUMBERJACK));
-        setSettlerData(getSettlerData().withProfession(VillagesProfessions.LUMBERJACK));
-
-        ItemStack axe = new ItemStack(Items.WOODEN_AXE, 1);
-        mainTool.addStack(axe);
-
-        return initialize;
+    protected Brain.Profile<?> createBrainProfile() {
+        return Brain.createProfile(LumberjackEntity.memories, LumberjackEntity.sensors);
     }
 
     @Override
-    protected void initGoals() {
-        super.initGoals();
-        this.goalSelector.add(2, new MoveToTreeGoal(this));
-        this.goalSelector.add(2, CollectItemsGoal.ofTags(this, Arrays.asList(ItemTags.SAPLINGS, ItemTags.LOGS)));
-        this.goalSelector.add(3, new PlantSaplingGoal(this));
-        this.goalSelector.add(3, new DeliverItemsToStorageGoal(this, ItemTags.SAPLINGS));
-        this.goalSelector.add(3, new DeliverItemsToStorageGoal(this, ItemTags.LOGS));
-        this.goalSelector.add(4, new BreakTreeGoal(this));
+    public boolean isRequiredTool(Item item) {
+        return item instanceof AxeItem;
+    }
+
+    @Override
+    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
+        EntityData initialize = super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
+        setSettlerData(getSettlerData().withProfession(VillagesProfessions.LUMBERJACK).withSkill(new Skill(VillagesProfessions.LUMBERJACK)));
+
+        ItemStack axe = new ItemStack(Items.WOODEN_AXE, 1);
+        setMainTool(axe);
+
+        return initialize;
     }
 
     @Override
@@ -73,17 +88,17 @@ public class LumberjackEntity extends ToolUserEntity implements IAnimatable {
 
     @Override
     public boolean canPickupItem(ItemStack stack) {
-        return super.canPickupItem(stack) || stack.isIn(ItemTags.SAPLINGS) || stack.isIn(ItemTags.LOGS);
+        return super.canPickupItem(stack) || stack.isIn(ItemTags.SAPLINGS) || stack.isIn(ItemTags.LOGS) || isRequiredTool(stack.getItem());
     }
 
     @Override
     protected PlayState handleAnimation(AnimationEvent<SettlerEntity> event) {
         AnimationController<SettlerEntity> controller = event.getController();
 
-        if (getRunningGoals().contains(IdentifierUtil.goal(BreakTreeGoal.class)) && !event.isMoving()) {
+        if (getRunningGoals().contains(IdentifierUtil.ofClass(ChopTreeTask.class)) && !event.isMoving()) {
             controller.setAnimation(VillagesAnimations.LUMBERJACK_CHOP_TREE);
             return PlayState.CONTINUE;
-        } else if (getRunningGoals().contains(IdentifierUtil.goal(PlantSaplingGoal.class)) && !event.isMoving()) {
+        } else if (getRunningGoals().contains(IdentifierUtil.ofClass(PlantSaplingTask.class)) && !event.isMoving()) {
             controller.setAnimation(VillagesAnimations.LUMBERJACK_PLANT_SAPLING);
             return PlayState.CONTINUE;
         } else {
@@ -91,8 +106,20 @@ public class LumberjackEntity extends ToolUserEntity implements IAnimatable {
         }
     }
 
+    @Override
+    protected void initBrain(World world) {
+        Brain<LumberjackEntity> b = (Brain<LumberjackEntity>) brain;
+
+        b.setTaskList(Activity.WORK, LumberjackTaskListFactory.createWorkTasks(this));
+        b.setTaskList(Activity.IDLE, SettlerTaskListFactory.createIdleTasks());
+
+        b.setCoreActivities(SettlerEntity.coreActivities);
+        b.setSchedule(LumberjackTaskListFactory.SCHEDULE);
+        b.refreshActivities(world.getTimeOfDay(), world.getTime());
+    }
+
     static {
-        sensors.addAll(Arrays.asList(VillagesSensors.TREE_SENSOR, VillagesSensors.SAPLING_SENSOR));
-        memories.addAll(Arrays.asList(VillagesMemories.TREE, VillagesMemories.SAPLING));
+        LumberjackEntity.sensors.addAll(SettlerEntity.sensors);
+        LumberjackEntity.memories.addAll(SettlerEntity.memories);
     }
 }

@@ -7,7 +7,7 @@ import net.minecraft.entity.ai.brain.sensor.Sensor;
 import net.minecraft.item.Item;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.Tag;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.dynamic.GlobalPos;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,10 +16,10 @@ import java.util.Set;
 public class ItemSensor extends Sensor<SettlerEntity> {
 
     private final Tag.Identified<Item> requestedItem;
-    private MemoryModuleType<BlockPos> memory;
+    private final MemoryModuleType<GlobalPos> memory;
     private final float radius;
 
-    public ItemSensor(Tag.Identified<Item> requestedItem, MemoryModuleType<BlockPos> memory, float radius) {
+    public ItemSensor(Tag.Identified<Item> requestedItem, MemoryModuleType<GlobalPos> memory, float radius) {
         this.requestedItem = requestedItem;
         this.memory = memory;
         this.radius = radius;
@@ -27,13 +27,13 @@ public class ItemSensor extends Sensor<SettlerEntity> {
 
     @Override
     protected void sense(ServerWorld world, SettlerEntity entity) {
-        Optional<BlockPos> optionalMemory = entity.getBrain().getOptionalMemory(memory);
+        Optional<GlobalPos> optionalMemory = entity.getBrain().getOptionalMemory(memory);
 
         if (optionalMemory.isEmpty()) {
             List<ItemEntity> saplings = entity.world.getEntitiesByClass(ItemEntity.class, entity.getBoundingBox().expand(radius), this::isItem);
 
             if (!saplings.isEmpty()) {
-                entity.getBrain().remember(memory, saplings.get(0).getBlockPos());
+                entity.getBrain().remember(memory, GlobalPos.create(world.getRegistryKey(), saplings.get(0).getBlockPos()));
             }
         }
     }
