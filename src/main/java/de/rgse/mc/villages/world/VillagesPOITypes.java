@@ -19,12 +19,12 @@ public class VillagesPOITypes {
 
     public static final List<Block> CAMPING_SITE_BLOCKS = Arrays.asList(Blocks.CAMPFIRE);
 
-    public static final PointOfInterestType CAMPING_SITE = PointOfInterestTypeAccessor.register(IdentifierUtil.createString("camping_site"),
+    public static final PointOfInterestType CAMPING_SITE = PointOfInterestTypeAccessor.callRegister(IdentifierUtil.createString("camping_site"),
             getCampingsite()
             , 32, 100);
 
     private static Set<BlockState> getCampingsite() {
-        return CAMPING_SITE_BLOCKS.stream().flatMap(b -> PointOfInterestTypeAccessor.getAllStatesOf(b).stream()).collect(Collectors.toSet());
+        return CAMPING_SITE_BLOCKS.stream().flatMap(b -> PointOfInterestTypeAccessor.callGetAllStatesOf(b).stream()).collect(Collectors.toSet());
     }
 
     public static void register() {

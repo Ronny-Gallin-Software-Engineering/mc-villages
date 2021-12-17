@@ -10,8 +10,8 @@ import java.util.function.Supplier;
 @Mixin(Registry.class)
 public interface RegistryAccessor {
 
-    @Invoker("create")
-    static <T> Registry<T> create(RegistryKey<? extends Registry<T>> key, Supplier<T> defaultEntry) {
+    @Invoker
+    static <T> Registry<T> callCreate(RegistryKey<? extends Registry<T>> key, Supplier<T> defaultEntry) {
         throw new UnsupportedOperationException();
     }
 }

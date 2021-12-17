@@ -17,7 +17,7 @@ public class VillagesProfessions {
     private static Registry<Profession> registry;
 
     public static void register() {
-        registry = RegistryAccessor.create(RegistryKey.ofRegistry(IdentifierUtil.create("professions")), () -> NONE);
+        registry = RegistryAccessor.callCreate(RegistryKey.ofRegistry(IdentifierUtil.create("professions")), () -> NONE);
         Registry.register(registry, NONE.getIdentifier(), NONE);
         Registry.register(registry, LUMBERJACK.getIdentifier(), LUMBERJACK);
     }

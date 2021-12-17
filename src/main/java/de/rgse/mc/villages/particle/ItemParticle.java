@@ -35,7 +35,7 @@ public class ItemParticle extends SpriteBillboardParticle {
             ItemParticle particle = new ItemParticle(clientWorld, x, y, z, vx, vy, vz);
 
             if (defaultParticleType instanceof ItemParticleEffect effect) {
-                particle.setSprite(MinecraftClient.getInstance().getItemRenderer().getModels().getModelParticleSprite(effect.getItem()));
+                particle.setSprite(MinecraftClient.getInstance().getItemRenderer().getModels().getModel(effect.getItem()).getParticleSprite());
             }
 
             return particle;

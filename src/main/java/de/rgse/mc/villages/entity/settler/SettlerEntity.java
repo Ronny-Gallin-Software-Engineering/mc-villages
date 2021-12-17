@@ -117,7 +117,7 @@ public class SettlerEntity extends PassiveEntity implements IAnimatable, Invento
     @Override
     public void registerControllers(AnimationData animationData) {
         AnimationController<SettlerEntity> controller = new AnimationController(this, "settler_controller", 0, this::handleAnimation);
-        controller.registerParticleListener(VillagesParticleUtil.createParticleListener(this, 2, () -> world.getRandom().nextInt(4) * .01f, 5));
+        controller.registerParticleListener(VillagesParticleUtil.createParticleListener(this, 1, () -> world.getRandom().nextInt(4) * .01f, 5));
         animationData.addAnimationController(controller);
     }
 

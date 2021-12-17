@@ -9,7 +9,7 @@ import net.minecraft.entity.ai.brain.Activity;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class VillagesActivities {
 
-    public static final Activity BREAKFAST = ActivityAccessor.register(IdentifierUtil.createString("task_breakfast"));
+    public static final Activity BREAKFAST = ActivityAccessor.callRegister(IdentifierUtil.createString("task_breakfast"));
 
     public static void register() {
     }

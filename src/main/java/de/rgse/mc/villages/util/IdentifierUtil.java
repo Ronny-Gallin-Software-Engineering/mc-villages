@@ -27,6 +27,10 @@ public class IdentifierUtil {
         return new IdentifierBuilder("geo");
     }
 
+    public static IdentifierBuilder dynamic() {
+        return new IdentifierBuilder("dynamic");
+    }
+
     public static Identifier profession(String value) {
         return new Identifier(VillagesMod.MOD_ID, "profession_" + value);
     }
@@ -67,6 +71,7 @@ public class IdentifierUtil {
 
         private final StringBuilder identifier;
         private Gender gender;
+        private Profession profession;
 
         private IdentifierBuilder(String type) {
             this.identifier = new StringBuilder(type + "/");
@@ -82,10 +87,41 @@ public class IdentifierUtil {
             return this;
         }
 
+        public IdentifierBuilder body() {
+            identifier.append("body/");
+            return this;
+        }
+
+        public IdentifierBuilder head() {
+            identifier.append("head/");
+            return this;
+        }
+
+        public IdentifierBuilder hair(int number) {
+            identifier.append("hair/" + number);
+            return this;
+        }
+
+        public IdentifierBuilder face(int number) {
+            identifier.append("faces/" + number);
+            return this;
+        }
+
+        public Identifier id(int id) {
+            identifier.append("id_" + id);
+            return new Identifier(VillagesMod.MOD_ID, identifier.toString());
+        }
+
         public IdentifierBuilder gender(Gender gender) {
             this.gender = gender;
             return this;
         }
+
+        public IdentifierBuilder profession(Profession profession) {
+            this.profession = profession;
+            return this;
+        }
+
 
         public Identifier named(String name) {
             identifier.append(name);
@@ -93,14 +129,20 @@ public class IdentifierUtil {
         }
 
         public Identifier formatted(String name) {
-            String format = gender != null ? getGendered(name) : name;
+            String formatted = gender != null ? getGendered(name) : name;
+            formatted = profession != null ? getProfessioned(formatted) : formatted;
 
-            identifier.append(format);
+            identifier.append(formatted);
             return new Identifier(VillagesMod.MOD_ID, identifier.toString());
         }
 
         private String getGendered(String name) {
             return name.replace("{gender}", this.gender.name().toLowerCase(Locale.ROOT));
         }
+
+        private String getProfessioned(String name) {
+            return name.replace("{profession}", this.profession.getIdentifier().getPath());
+        }
+
     }
 }

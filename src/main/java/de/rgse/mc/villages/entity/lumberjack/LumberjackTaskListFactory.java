@@ -22,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LumberjackTaskListFactory {
 
-    public static final Schedule SCHEDULE = ScheduleAccessor.register(IdentifierUtil.createString("schedule_lumberjack"))
+    public static final Schedule SCHEDULE = ScheduleAccessor.callRegister(IdentifierUtil.createString("schedule_lumberjack"))
             .withActivity(ClockUtil.DAWN, Activity.WORK)
             .withActivity(ClockUtil.NOON, Activity.IDLE)
             .withActivity(ClockUtil.two(ClockUtil.MeridiemIndicator.PM), Activity.WORK)

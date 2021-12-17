@@ -8,13 +8,13 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(MemoryModuleType.class)
 public interface MemoryModuleTypeAccessor {
 
-    @Invoker("register")
-    static <U> MemoryModuleType<U> register(String id) {
+    @Invoker
+    static <U> MemoryModuleType<U> callRegister(String id) {
         throw new AssertionError();
     }
 
-    @Invoker("register")
-    static <U> MemoryModuleType<U> register(String id, Codec<U> codec) {
+    @Invoker
+    static <U> MemoryModuleType<U> callRegister(String id, Codec<U> codec) {
         throw new AssertionError();
     }
 }

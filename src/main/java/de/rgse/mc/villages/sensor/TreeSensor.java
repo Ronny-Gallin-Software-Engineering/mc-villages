@@ -4,12 +4,14 @@ import de.rgse.mc.villages.block.PillarBlockEntity;
 import de.rgse.mc.villages.entity.settler.SettlerEntity;
 import de.rgse.mc.villages.pattern.TreePattern;
 import de.rgse.mc.villages.task.VillagesMemories;
+import de.rgse.mc.villages.util.VillagesParticleUtil;
 import lombok.NoArgsConstructor;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.sensor.Sensor;
+import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.Tag;
@@ -24,6 +26,8 @@ import java.util.Set;
 public class TreeSensor extends Sensor<SettlerEntity> {
 
     private static final Tag.Identified<Block> BLOCK = BlockTags.LOGS;
+
+    private int timesNoTreeFound = 0;
 
     private final Random random = new Random();
 
@@ -61,6 +65,14 @@ public class TreeSensor extends Sensor<SettlerEntity> {
                     entity.getBrain().remember(VillagesMemories.TREE, GlobalPos.create(world.getRegistryKey(), stump));
                     break;
                 }
+            }
+        }
+
+        if(entity.getBrain().getOptionalMemory(VillagesMemories.TREE).isEmpty()) {
+            timesNoTreeFound++;
+            if(timesNoTreeFound >= 10) {
+                VillagesParticleUtil.spawnItemParticle(world, entity, Items.BIRCH_LOG);
+                timesNoTreeFound = 0;
             }
         }
     }

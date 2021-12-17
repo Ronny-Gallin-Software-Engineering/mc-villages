@@ -9,10 +9,14 @@ import de.rgse.mc.villages.skill.VillagesSkills;
 import de.rgse.mc.villages.task.BreakBlockTask;
 import de.rgse.mc.villages.task.VillagesMemories;
 import de.rgse.mc.villages.util.IdentifierUtil;
+import de.rgse.mc.villages.util.VillagesParticleUtil;
+import lombok.extern.slf4j.Slf4j;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.ai.brain.MemoryModuleState;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.WalkTarget;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
@@ -28,6 +32,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 public class ChopTreeTask extends BreakBlockTask {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -52,10 +57,18 @@ public class ChopTreeTask extends BreakBlockTask {
         if (optional.isPresent() && canMine(entity, optional.get().getPos())) {
             entity.getBrain().remember(MemoryModuleType.WALK_TARGET, new WalkTarget(optional.get().getPos(), walkSpeed, reach));
             return serverWorld.getRegistryKey() == optional.get().getDimension() && !hasReached(serverWorld, entity)
-                    | super.shouldRun(serverWorld, entity);
-        } else {
-            return false;
+                    || super.shouldRun(serverWorld, entity);
+        } else if(optional.isEmpty()){
+            log.info("unable to chop tree: {}", "no position");
+            VillagesParticleUtil.spawnItemParticle(serverWorld, entity, Items.SPRUCE_LOG);
+
+        } else if(canMine(entity, optional.get().getPos())) {
+            log.info("unable to chop tree: {}", "no tool");
+            ItemStack mainTool = entity.getMainTool();
+            VillagesParticleUtil.spawnItemParticle(serverWorld, entity, mainTool.getItem());
         }
+
+        return false;
     }
 
     @Override
@@ -153,6 +166,6 @@ public class ChopTreeTask extends BreakBlockTask {
 
     private BlockPos getTargetPos(SettlerEntity entity) {
         Optional<GlobalPos> optionalMemory = entity.getBrain().getOptionalMemory(target);
-        return optionalMemory.isPresent() ? optionalMemory.get().getPos() : null;
+        return optionalMemory.map(GlobalPos::getPos).orElse(null);
     }
 }

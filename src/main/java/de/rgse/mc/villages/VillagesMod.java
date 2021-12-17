@@ -2,7 +2,9 @@ package de.rgse.mc.villages;
 
 import de.rgse.mc.villages.block.VillagesBlockEntities;
 import de.rgse.mc.villages.command.VillagesCommands;
+import de.rgse.mc.villages.config.DynamicTexturesConfig;
 import de.rgse.mc.villages.config.GameplayConfig;
+import de.rgse.mc.villages.config.VillageConfig;
 import de.rgse.mc.villages.config.WorldConfig;
 import de.rgse.mc.villages.entity.VillagesEntities;
 import de.rgse.mc.villages.entity.VillagesProfessions;
@@ -14,7 +16,6 @@ import de.rgse.mc.villages.particle.VillagesParticles;
 import de.rgse.mc.villages.poi.VillagesPOI;
 import de.rgse.mc.villages.resource.VillagesResources;
 import de.rgse.mc.villages.sensor.VillagesSensors;
-import de.rgse.mc.villages.sound.VillagesSounds;
 import de.rgse.mc.villages.task.VillagesActivities;
 import de.rgse.mc.villages.task.VillagesSchedules;
 import de.rgse.mc.villages.world.VillagesPOITypes;
@@ -30,7 +31,7 @@ public class VillagesMod implements ModInitializer {
 
     public static final Logger LOGGER = LogManager.getLogger();
 
-    public static final Config CONFIG = new Config(MOD_ID, new WorldConfig(), new GameplayConfig());
+    public static final Config CONFIG = new Config(MOD_ID, new WorldConfig(), new GameplayConfig(), new VillageConfig(), new DynamicTexturesConfig());
 
     @Override
     public void onInitialize() {
@@ -50,7 +51,6 @@ public class VillagesMod implements ModInitializer {
         VillagesActivities.register();
         VillagesSchedules.register();
         VillagesSensors.register();
-        VillagesSounds.register();
         VillagesNetwork.register();
         VillagesParticles.register();
         VillagesPOI.register();

@@ -10,8 +10,8 @@ import java.util.function.Supplier;
 @Mixin(SensorType.class)
 public interface SensorTypeAccessor {
 
-    @Invoker("register")
-    static <U extends Sensor<?>> SensorType<U> register(String id, Supplier<U> factory) {
+    @Invoker
+    static <U extends Sensor<?>> SensorType<U> callRegister(String id, Supplier<U> factory) {
         throw new UnsupportedOperationException();
     }
 }

@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(Schedule.class)
 public interface ScheduleAccessor {
 
-    @Invoker("register")
-    static ScheduleBuilder register(String id) {
+    @Invoker
+    static ScheduleBuilder callRegister(String id) {
         throw new AssertionError();
     }
 

@@ -13,13 +13,7 @@ public class SettlerEntityModel extends AnimatedGeoModel<SettlerEntity> {
 
     @Override
     public Identifier getTextureLocation(SettlerEntity settler) {
-        SettlerData settlerData = settler.getSettlerData();
-        IdentifierUtil.IdentifierBuilder builder = IdentifierUtil.texture().entity().gender(settlerData.getGender());
-        if (settlerData.getMood().isSad()) {
-            return builder.formatted("settler/settler_{gender}_sad.png");
-        } else {
-            return builder.formatted("settler/settler_{gender}.png");
-        }
+        return IdentifierUtil.dynamic().id(settler.getId());
     }
 
     @Override

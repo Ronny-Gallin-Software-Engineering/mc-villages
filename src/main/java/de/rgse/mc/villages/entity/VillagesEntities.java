@@ -1,7 +1,6 @@
 package de.rgse.mc.villages.entity;
 
 import de.rgse.mc.villages.entity.lumberjack.LumberjackEntity;
-import de.rgse.mc.villages.entity.lumberjack.LumberjackEntityModel;
 import de.rgse.mc.villages.entity.settler.SettlerEntity;
 import de.rgse.mc.villages.entity.settler.SettlerEntityModel;
 import de.rgse.mc.villages.entity.settler.SettlerEntityRenderer;
@@ -36,6 +35,6 @@ public class VillagesEntities {
 
     public static void registerClient() {
         EntityRendererRegistry.register(VillagesEntities.SETTLER, ctx -> SettlerEntityRenderer.of(ctx, SettlerEntityModel.class));
-        EntityRendererRegistry.register(VillagesEntities.LUMBERJACK, ctx -> SettlerEntityRenderer.of(ctx, LumberjackEntityModel.class));
+        EntityRendererRegistry.register(VillagesEntities.LUMBERJACK, ctx -> SettlerEntityRenderer.of(ctx, SettlerEntityModel.class));
     }
 }

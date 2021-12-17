@@ -7,8 +7,8 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(Activity.class)
 public interface ActivityAccessor {
 
-    @Invoker("register")
-    static Activity register(String id) {
+    @Invoker
+    static Activity callRegister(String id) {
         throw new AssertionError();
     }
 }

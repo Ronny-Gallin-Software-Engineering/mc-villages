@@ -21,11 +21,11 @@ public class PillarBlockEntity extends BlockEntity {
         naturallyGenerated = false;
     }
 
+
     @Override
-    public NbtCompound writeNbt(NbtCompound nbt) {
-        NbtCompound compound = super.writeNbt(nbt);
-        compound.putBoolean(NBT_KEY, naturallyGenerated);
-        return compound;
+    public void writeNbt(NbtCompound nbt) {
+        super.writeNbt(nbt);
+        nbt.putBoolean(NBT_KEY, naturallyGenerated);
     }
 
     @Override

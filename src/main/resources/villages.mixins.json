@@ -12,6 +12,7 @@
     "MemoryModuleTypeAccessor",
     "PointOfInterestTypeAccessor",
     "RegistryAccessor",
+    "ResourceTextureMixin",
     "ScheduleAccessor",
     "SensorTypeAccessor",
     "TrunkPlacerMixin"
